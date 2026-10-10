@@ -172,8 +172,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Updated with Latest Deployment Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX1MwsHm5DsI3rWtfCO_HNnuOnlrxOvK-aMtvbComSbSzLApBkKVTUKMj1dMOS9AtG/exec";
+    // Connected with your New Google Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlrlx3bfYnit3buvuKCJ1DQ4OmJ90DJKhAuwdVhJUZyTre2ldmL7TqgcjJOnQCLfVG/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -297,7 +297,17 @@
                 try {
                     let parsed = JSON.parse(data.contents);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                        transactions = parsed.map((t, index) => {
+                        
+                        // Parse OPENING stock and transactions from Google Sheet
+                        parsed.forEach(t => {
+                            const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                            if (item && t.type === 'OPENING') {
+                                item.opening = Number(t.qty);
+                            }
+                        });
+                        localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
+
+                        transactions = parsed.filter(t => t.type !== 'OPENING').map((t, index) => {
                             const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
                             return {
                                 id: Date.now() + index,
@@ -308,6 +318,7 @@
                             };
                         });
                         localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+                        
                         renderTables();
                     }
                 } catch(e) {
@@ -356,7 +367,30 @@
         if (item) {
             item.opening = opening;
             localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
-            alert(`${item.name} Opening Stock updated to ${opening}!`);
+
+            // Sync Opening Stock directly to Google Sheets
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const payload = {
+                date: todayStr,
+                itemName: item.name,
+                category: item.category,
+                type: 'OPENING',
+                qty: opening
+            };
+
+            if (SCRIPT_URL) {
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    console.log("Opening Stock Synced to Google Sheets!");
+                    setTimeout(fetchFromGoogleSheets, 1200);
+                }).catch(err => console.error("Sheets Opening Stock Sync Error: ", err));
+            }
+
+            alert(`${item.name} Opening Stock updated to ${opening} and saved to Google Sheet!`);
         }
 
         document.getElementById('newCat').value = '';
