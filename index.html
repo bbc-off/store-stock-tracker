@@ -172,8 +172,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Connected with your New Google Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHV0qPwmYUsqIs74PrLrml8hhxt2IuIRuv0_RWure3BtMA2FB6zPspeY9LWSnZlQ96cA/exec";
+    // Updated with Latest Deployment Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX1MwsHm5DsI3rWtfCO_HNnuOnlrxOvK-aMtvbComSbSzLApBkKVTUKMj1dMOS9AtG/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -279,11 +279,10 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         updateItemDropdown();
-        renderTables(); // Always render items immediately so table is never empty!
+        renderTables(); 
         fetchFromGoogleSheets();
     });
 
-    // Safely Fetch Google Sheets data without crashing or clearing items on error
     function fetchFromGoogleSheets() {
         if (!SCRIPT_URL) return;
 
@@ -312,11 +311,11 @@
                         renderTables();
                     }
                 } catch(e) {
-                    console.log("Sheet empty or parse error, keeping local view");
+                    console.log("Sheet empty or parse error");
                 }
             })
             .catch(err => {
-                console.log("Error loading sheet, keeping local view:", err);
+                console.log("Error loading sheet:", err);
             });
     }
 
