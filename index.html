@@ -5,114 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blockbuster Perling Store Stock Tracker</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: #f0f2f5;
-            padding: 10px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        h2 {
-            text-align: center;
-            color: #1e293b;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 20px;
-        }
-
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f0f2f5; padding: 10px; color: #333; }
+        .container { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #1e293b; margin-bottom: 20px; font-size: 20px; }
+        .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
         @media (max-width: 900px) {
-            body { padding: 5px; }
-            .container { padding: 12px; }
-            .grid-layout { grid-template-columns: 1fr; }
-            h2 { font-size: 18px; }
-            .toolbar { flex-direction: column; align-items: flex-start !important; }
+            body { padding: 5px; } .container { padding: 12px; } .grid-layout { grid-template-columns: 1fr; }
+            h2 { font-size: 18px; } .toolbar { flex-direction: column; align-items: flex-start !important; }
             .toolbar-btns { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
             .btn-excel, .btn-pdf, .btn-pdf-daily { flex: 1 1 auto; text-align: center; }
         }
-
-        .card {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 15px;
-        }
-
-        .card h3 {
-            margin-bottom: 12px;
-            color: #0f172a;
-            font-size: 14px;
-            border-bottom: 2px solid #cbd5e1;
-            padding-bottom: 6px;
-        }
-
+        .card { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .card h3 { margin-bottom: 12px; color: #0f172a; font-size: 14px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; }
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
         .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
-
-        .btn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 13px;
-        }
-
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 13px; }
         .btn-primary { background-color: #2563eb; color: white; }
         .btn-success { background-color: #16a34a; color: white; }
         .btn-excel { background-color: #15803d; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf { background-color: #dc2626; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf-daily { background-color: #d97706; color: white; padding: 8px 10px; font-size: 12px; }
-
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
         .toolbar h3 { font-size: 15px; }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 5px; border-radius: 6px; border: 1px solid #e2e8f0; }
         .category-header { background-color: #334155; color: #fff; font-weight: bold; padding: 8px 10px; }
-
         table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
         th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
         th { background-color: #1e293b; color: white; }
-
         .tag-in { color: #16a34a; font-weight: bold; }
         .tag-out { color: #dc2626; font-weight: bold; }
         .tag-pelangi { color: #d97706; font-weight: bold; }
-
         .status-green { background-color: #dcfce7; color: #15803d; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
         .status-yellow { background-color: #fef9c3; color: #a16207; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
         .status-red { background-color: #fee2e2; color: #b91c1c; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
-
         .delete-btn { background: #ef4444; color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; }
 
         @media print {
@@ -245,8 +172,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Connected with your New Google Apps Script Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze25btJfiru6hLZxjY_pp8_HsspoPIrl6mFldqdCzRfQoBfc2WrKqs_Tj4XRlSI6Gmrw/exec";
+    // ⚠️ ஒட்டவும்: உங்களுடைய புதிய Google Web App URL
+    const SCRIPT_URL = "YOUR_NEW_WEB_APP_URL_HERE";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -355,19 +282,22 @@
         fetchFromGoogleSheets();
     });
 
-    // Fetch live data directly from Google Sheets
+    // CORS Fix: Fetch Google Sheets data using JSONP Proxy
     function fetchFromGoogleSheets() {
-        if (!SCRIPT_URL) {
+        if (!SCRIPT_URL || SCRIPT_URL === "YOUR_NEW_WEB_APP_URL_HERE") {
             renderTables();
             return;
         }
 
-        fetch(SCRIPT_URL)
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(SCRIPT_URL);
+
+        fetch(proxyUrl)
             .then(response => response.json())
             .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                    transactions = data.map((t, index) => {
-                        const item = masterItems.find(i => i.name.toLowerCase() === t.itemName.toLowerCase());
+                let parsed = JSON.parse(data.contents);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    transactions = parsed.map((t, index) => {
+                        const item = masterItems.find(i => i.name.trim().toLowerCase() === t.itemName.trim().toLowerCase());
                         return {
                             id: Date.now() + index,
                             date: t.date,
@@ -381,7 +311,7 @@
                 renderTables();
             })
             .catch(err => {
-                console.error("Error fetching from Sheets:", err);
+                console.error("Sheets Fetch Error:", err);
                 renderTables();
             });
     }
@@ -456,7 +386,7 @@
         transactions.push({ id: Date.now(), date, itemId, type, qty });
         localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
 
-        if (SCRIPT_URL) {
+        if (SCRIPT_URL && SCRIPT_URL !== "YOUR_NEW_WEB_APP_URL_HERE") {
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -464,7 +394,7 @@
                 body: JSON.stringify(payload)
             }).then(() => {
                 console.log("Synced with Google Sheets!");
-                setTimeout(fetchFromGoogleSheets, 1000);
+                setTimeout(fetchFromGoogleSheets, 1200);
             }).catch(err => console.error("Sheets Sync Error: ", err));
         }
 
