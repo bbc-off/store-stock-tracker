@@ -686,25 +686,25 @@
         XLSX.writeFile(workbook, `Blockbuster_Stock_Breakup_${selectedMonth}.xlsx`);
     }
 
-    // Complete Clean PDF Generator (Guarantees No Row Cuts & Includes All Items)
+    // Complete Fixed PDF Generator (Compact Padding ensures 100% of items fit perfectly)
     function exportToPDF() {
         let pdfContainer = document.createElement('div');
-        pdfContainer.style.width = '700px';
-        pdfContainer.style.padding = '20px';
+        pdfContainer.style.width = '680px';
+        pdfContainer.style.padding = '10px';
         pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
 
         let htmlContent = `
-            <h2 style="text-align: center; color: #1e293b; margin-bottom: 5px; font-size: 18px;">🎬 Blockbuster Perling Store Stock Summary</h2>
-            <p style="text-align: center; color: #64748b; font-size: 11px; margin-bottom: 15px;">Generated on: ${new Date().toLocaleDateString()}</p>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <h2 style="text-align: center; color: #1e293b; margin-bottom: 2px; font-size: 16px;">🎬 Blockbuster Perling Store Stock Summary</h2>
+            <p style="text-align: center; color: #64748b; font-size: 10px; margin-bottom: 10px;">Generated on: ${new Date().toLocaleDateString()}</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.2;">
                 <thead>
                     <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 6px; text-align: left; border: 1px solid #cbd5e1;">Item Name</th>
-                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Opening</th>
-                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Total IN</th>
-                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Total OUT</th>
-                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 70px;">Closing</th>
-                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 90px;">Status</th>
+                        <th style="padding: 4px 6px; text-align: left; border: 1px solid #cbd5e1;">Item Name</th>
+                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Opening</th>
+                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Total IN</th>
+                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Total OUT</th>
+                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 65px;">Closing</th>
+                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 85px;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -715,7 +715,7 @@
         categories.forEach(cat => {
             htmlContent += `
                 <tr style="page-break-inside: avoid; break-inside: avoid;">
-                    <td colspan="6" style="background-color: #334155; color: white; font-weight: bold; padding: 6px 8px; border: 1px solid #cbd5e1;">📁 ${cat}</td>
+                    <td colspan="6" style="background-color: #334155; color: white; font-weight: bold; padding: 4px 6px; border: 1px solid #cbd5e1; font-size: 10px;">📁 ${cat}</td>
                 </tr>
             `;
 
@@ -740,13 +740,13 @@
 
                 htmlContent += `
                     <tr style="page-break-inside: avoid; break-inside: avoid;">
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; font-weight: 600;">${item.name}</td>
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">${item.opening}</td>
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; color: #16a34a; font-weight: bold;">+${totalIn}</td>
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; color: #dc2626; font-weight: bold;">-${totalOut}</td>
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${closingBalance}</td>
-                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">
-                            <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${statusText}</span>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; font-weight: 600;">${item.name}</td>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center;">${item.opening}</td>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; color: #16a34a; font-weight: bold;">+${totalIn}</td>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; color: #dc2626; font-weight: bold;">-${totalOut}</td>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${closingBalance}</td>
+                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center;">
+                            <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 1px 5px; border-radius: 3px; font-weight: bold; font-size: 9px;">${statusText}</span>
                         </td>
                     </tr>
                 `;
@@ -757,7 +757,7 @@
         pdfContainer.innerHTML = htmlContent;
 
         const opt = {
-            margin:       [10, 10, 10, 10],
+            margin:       [8, 8, 8, 8],
             filename:     'Blockbuster_Stock_Summary.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
@@ -781,21 +781,21 @@
         }
 
         let pdfContainer = document.createElement('div');
-        pdfContainer.style.width = '700px';
-        pdfContainer.style.padding = '20px';
+        pdfContainer.style.width = '680px';
+        pdfContainer.style.padding = '10px';
         pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
 
         let htmlContent = `
-            <h2 style="text-align: center; color: #1e293b; font-size: 18px;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
-            <h4 style="text-align: center; color: #64748b; margin-bottom: 15px; font-size: 13px;">Month: ${selectedMonth}</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <h2 style="text-align: center; color: #1e293b; font-size: 16px;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
+            <h4 style="text-align: center; color: #64748b; margin-bottom: 10px; font-size: 12px;">Month: ${selectedMonth}</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
                 <thead>
                     <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Date</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Item Name</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Type / Destination</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Quantity</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Remaining Balance</th>
+                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Date</th>
+                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Item Name</th>
+                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Type / Destination</th>
+                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Quantity</th>
+                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Remaining Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -809,11 +809,11 @@
 
             htmlContent += `
                 <tr style="page-break-inside: avoid; break-inside: avoid;">
-                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${t.date}</td>
-                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${itemName}</td>
-                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${typeText}</td>
-                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${t.qty}</td>
-                    <td style="padding: 5px; border: 1px solid #cbd5e1; font-weight: bold;">${runningBalance}</td>
+                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${t.date}</td>
+                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${itemName}</td>
+                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${typeText}</td>
+                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${t.qty}</td>
+                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1; font-weight: bold;">${runningBalance}</td>
                 </tr>
             `;
         });
@@ -822,7 +822,7 @@
         pdfContainer.innerHTML = htmlContent;
 
         const opt = {
-            margin:       [10, 10, 10, 10],
+            margin:       [8, 8, 8, 8],
             filename:     `Blockbuster_Daily_Transactions_${selectedMonth}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
