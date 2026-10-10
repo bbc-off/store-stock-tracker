@@ -41,32 +41,13 @@
         }
 
         @media (max-width: 900px) {
-            body {
-                padding: 5px;
-            }
-            .container {
-                padding: 12px;
-            }
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-            h2 {
-                font-size: 18px;
-            }
-            .toolbar {
-                flex-direction: column;
-                align-items: flex-start !important;
-            }
-            .toolbar-btns {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 5px;
-                width: 100%;
-            }
-            .btn-excel, .btn-pdf, .btn-pdf-daily {
-                flex: 1 1 auto;
-                text-align: center;
-            }
+            body { padding: 5px; }
+            .container { padding: 12px; }
+            .grid-layout { grid-template-columns: 1fr; }
+            h2 { font-size: 18px; }
+            .toolbar { flex-direction: column; align-items: flex-start !important; }
+            .toolbar-btns { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
+            .btn-excel, .btn-pdf, .btn-pdf-daily { flex: 1 1 auto; text-align: center; }
         }
 
         .card {
@@ -85,24 +66,9 @@
             padding-bottom: 6px;
         }
 
-        .form-group {
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 12px;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 13px;
-        }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
 
         .btn {
             width: 100%;
@@ -116,26 +82,13 @@
         }
 
         .btn-primary { background-color: #2563eb; color: white; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-
         .btn-success { background-color: #16a34a; color: white; }
-        .btn-success:hover { background-color: #15803d; }
-
         .btn-excel { background-color: #15803d; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf { background-color: #dc2626; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf-daily { background-color: #d97706; color: white; padding: 8px 10px; font-size: 12px; }
 
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .toolbar h3 {
-            font-size: 15px;
-        }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .toolbar h3 { font-size: 15px; }
 
         .table-responsive {
             width: 100%;
@@ -146,78 +99,37 @@
             border: 1px solid #e2e8f0;
         }
 
-        .category-header {
-            background-color: #334155;
-            color: #fff;
-            font-weight: bold;
-            padding: 8px 10px;
-        }
+        .category-header { background-color: #334155; color: #fff; font-weight: bold; padding: 8px 10px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            min-width: 500px;
-        }
-
-        th, td {
-            padding: 7px 9px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            white-space: nowrap;
-        }
-
-        th {
-            background-color: #1e293b;
-            color: white;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
+        th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        th { background-color: #1e293b; color: white; }
 
         .tag-in { color: #16a34a; font-weight: bold; }
         .tag-out { color: #dc2626; font-weight: bold; }
         .tag-pelangi { color: #d97706; font-weight: bold; }
 
-        .status-green {
-            background-color: #dcfce7;
-            color: #15803d;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 11px;
-            display: inline-block;
-        }
+        .status-green { background-color: #dcfce7; color: #15803d; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
+        .status-yellow { background-color: #fef9c3; color: #a16207; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
+        .status-red { background-color: #fee2e2; color: #b91c1c; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
 
-        .status-yellow {
-            background-color: #fef9c3;
-            color: #a16207;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 11px;
-            display: inline-block;
-        }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; }
 
-        .status-red {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 11px;
-            display: inline-block;
-        }
-
-        .delete-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 3px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
+        /* Perfect Native Printing Styles */
+        @media print {
+            body { background: #fff !important; padding: 0 !important; }
+            .container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; }
+            .grid-layout > div:first-child, .toolbar-btns, .delete-btn, h3 { display: none !important; }
+            .grid-layout { display: block !important; }
+            .table-responsive { overflow: visible !important; border: none !important; }
+            table { width: 100% !important; min-width: 100% !important; font-size: 11px !important; }
+            th, td { padding: 5px 8px !important; border: 1px solid #cbd5e1 !important; }
+            tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .category-header { background-color: #334155 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .status-green, .status-yellow, .status-red { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -686,151 +598,25 @@
         XLSX.writeFile(workbook, `Blockbuster_Stock_Breakup_${selectedMonth}.xlsx`);
     }
 
-    // Complete Fixed PDF Generator (Compact Padding ensures 100% of items fit perfectly)
+    // Uses Native Browser Print Window for 100% Perfect Unclipped PDF Output
     function exportToPDF() {
-        let pdfContainer = document.createElement('div');
-        pdfContainer.style.width = '680px';
-        pdfContainer.style.padding = '10px';
-        pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
-
-        let htmlContent = `
-            <h2 style="text-align: center; color: #1e293b; margin-bottom: 2px; font-size: 16px;">🎬 Blockbuster Perling Store Stock Summary</h2>
-            <p style="text-align: center; color: #64748b; font-size: 10px; margin-bottom: 10px;">Generated on: ${new Date().toLocaleDateString()}</p>
-            <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.2;">
-                <thead>
-                    <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 4px 6px; text-align: left; border: 1px solid #cbd5e1;">Item Name</th>
-                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Opening</th>
-                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Total IN</th>
-                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 55px;">Total OUT</th>
-                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 65px;">Closing</th>
-                        <th style="padding: 4px 6px; text-align: center; border: 1px solid #cbd5e1; width: 85px;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        const categories = [...new Set(masterItems.map(i => i.category))];
-
-        categories.forEach(cat => {
-            htmlContent += `
-                <tr style="page-break-inside: avoid; break-inside: avoid;">
-                    <td colspan="6" style="background-color: #334155; color: white; font-weight: bold; padding: 4px 6px; border: 1px solid #cbd5e1; font-size: 10px;">📁 ${cat}</td>
-                </tr>
-            `;
-
-            const catItems = masterItems.filter(i => i.category === cat);
-            catItems.forEach(item => {
-                const itemTrans = transactions.filter(t => t.itemId === item.id);
-                const totalIn = itemTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
-                const totalOut = itemTrans.filter(t => t.type === 'OUT' || t.type === 'PELANGI').reduce((a, b) => a + b.qty, 0);
-                const closingBalance = item.opening + totalIn - totalOut;
-
-                let statusText = '';
-                let statusBg = '';
-                let statusColor = '';
-
-                if (closingBalance >= item.high) {
-                    statusText = 'Sufficient'; statusBg = '#dcfce7'; statusColor = '#15803d';
-                } else if (closingBalance > 0) {
-                    statusText = 'Low Stock'; statusBg = '#fef9c3'; statusColor = '#a16207';
-                } else {
-                    statusText = 'Out of Stock'; statusBg = '#fee2e2'; statusColor = '#b91c1c';
-                }
-
-                htmlContent += `
-                    <tr style="page-break-inside: avoid; break-inside: avoid;">
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; font-weight: 600;">${item.name}</td>
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center;">${item.opening}</td>
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; color: #16a34a; font-weight: bold;">+${totalIn}</td>
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; color: #dc2626; font-weight: bold;">-${totalOut}</td>
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${closingBalance}</td>
-                        <td style="padding: 3px 6px; border: 1px solid #cbd5e1; text-align: center;">
-                            <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 1px 5px; border-radius: 3px; font-weight: bold; font-size: 9px;">${statusText}</span>
-                        </td>
-                    </tr>
-                `;
-            });
-        });
-
-        htmlContent += `</tbody></table>`;
-        pdfContainer.innerHTML = htmlContent;
-
-        const opt = {
-            margin:       [8, 8, 8, 8],
-            filename:     'Blockbuster_Stock_Summary.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opt).from(pdfContainer).save();
+        document.getElementById('logTable').closest('.table-responsive').style.display = 'none';
+        document.querySelector('h3[style*="margin-top: 25px"]').style.display = 'none';
+        
+        window.print();
+        
+        document.getElementById('logTable').closest('.table-responsive').style.display = 'block';
+        document.querySelector('h3[style*="margin-top: 25px"]').style.display = 'block';
     }
 
     function exportDailyLogPDF() {
-        const selectedMonth = prompt("Enter Month & Year for Daily Log PDF (YYYY-MM):", new Date().toISOString().slice(0, 7));
-        if (!selectedMonth) return;
-
-        const monthTrans = transactions.filter(t => t.date.startsWith(selectedMonth))
-                                       .sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
-
-        if (monthTrans.length === 0) {
-            alert("No transactions found for this month!");
-            return;
-        }
-
-        let pdfContainer = document.createElement('div');
-        pdfContainer.style.width = '680px';
-        pdfContainer.style.padding = '10px';
-        pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
-
-        let htmlContent = `
-            <h2 style="text-align: center; color: #1e293b; font-size: 16px;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
-            <h4 style="text-align: center; color: #64748b; margin-bottom: 10px; font-size: 12px;">Month: ${selectedMonth}</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-                <thead>
-                    <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Date</th>
-                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Item Name</th>
-                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Type / Destination</th>
-                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Quantity</th>
-                        <th style="padding: 5px; border: 1px solid #cbd5e1;">Remaining Balance</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        monthTrans.forEach(t => {
-            const item = masterItems.find(i => i.id === t.itemId);
-            const itemName = item ? `${item.name} (${item.category})` : 'Unknown Item';
-            let typeText = t.type === 'IN' ? 'IN' : (t.type === 'PELANGI' ? 'To Pelangi' : 'OUT');
-            const runningBalance = calculateBalanceAtPoint(t.itemId, t.id);
-
-            htmlContent += `
-                <tr style="page-break-inside: avoid; break-inside: avoid;">
-                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${t.date}</td>
-                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${itemName}</td>
-                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${typeText}</td>
-                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1;">${t.qty}</td>
-                    <td style="padding: 4px 5px; border: 1px solid #cbd5e1; font-weight: bold;">${runningBalance}</td>
-                </tr>
-            `;
-        });
-
-        htmlContent += `</tbody></table>`;
-        pdfContainer.innerHTML = htmlContent;
-
-        const opt = {
-            margin:       [8, 8, 8, 8],
-            filename:     `Blockbuster_Daily_Transactions_${selectedMonth}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opt).from(pdfContainer).save();
+        document.getElementById('stockTable').closest('.table-responsive').style.display = 'none';
+        document.querySelector('.toolbar h3').style.display = 'none';
+        
+        window.print();
+        
+        document.getElementById('stockTable').closest('.table-responsive').style.display = 'block';
+        document.querySelector('.toolbar h3').style.display = 'block';
     }
 </script>
 
