@@ -279,40 +279,44 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         updateItemDropdown();
+        renderTables(); // Always render items immediately so table is never empty!
         fetchFromGoogleSheets();
     });
 
-    // Fetch Google Sheets data using JSONP Proxy to bypass browser CORS rules
+    // Safely Fetch Google Sheets data without crashing or clearing items on error
     function fetchFromGoogleSheets() {
-        if (!SCRIPT_URL) {
-            renderTables();
-            return;
-        }
+        if (!SCRIPT_URL) return;
 
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(SCRIPT_URL);
 
         fetch(proxyUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error("Network error");
+                return response.json();
+            })
             .then(data => {
-                let parsed = JSON.parse(data.contents);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    transactions = parsed.map((t, index) => {
-                        const item = masterItems.find(i => i.name.trim().toLowerCase() === t.itemName.trim().toLowerCase());
-                        return {
-                            id: Date.now() + index,
-                            date: t.date,
-                            itemId: item ? item.id : 1,
-                            type: t.type,
-                            qty: Number(t.qty)
-                        };
-                    });
-                    localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+                try {
+                    let parsed = JSON.parse(data.contents);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        transactions = parsed.map((t, index) => {
+                            const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                            return {
+                                id: Date.now() + index,
+                                date: t.date,
+                                itemId: item ? item.id : 1,
+                                type: t.type,
+                                qty: Number(t.qty)
+                            };
+                        });
+                        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+                        renderTables();
+                    }
+                } catch(e) {
+                    console.log("Sheet empty or parse error, keeping local view");
                 }
-                renderTables();
             })
             .catch(err => {
-                console.error("Sheets Fetch Error:", err);
-                renderTables();
+                console.log("Error loading sheet, keeping local view:", err);
             });
     }
 
