@@ -14,7 +14,7 @@
 
         body {
             background-color: #f0f2f5;
-            padding: 20px;
+            padding: 10px;
             color: #333;
         }
 
@@ -22,7 +22,7 @@
             max-width: 1250px;
             margin: 0 auto;
             background: #fff;
-            padding: 25px;
+            padding: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
@@ -30,7 +30,8 @@
         h2 {
             text-align: center;
             color: #1e293b;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            font-size: 20px;
         }
 
         .grid-layout {
@@ -40,41 +41,64 @@
         }
 
         @media (max-width: 900px) {
+            body {
+                padding: 5px;
+            }
+            .container {
+                padding: 12px;
+            }
             .grid-layout {
                 grid-template-columns: 1fr;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            .toolbar-btns {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                width: 100%;
+            }
+            .btn-excel, .btn-pdf, .btn-pdf-daily {
+                flex: 1 1 auto;
+                text-align: center;
             }
         }
 
         .card {
             background: #f8fafc;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .card h3 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #0f172a;
-            font-size: 15px;
+            font-size: 14px;
             border-bottom: 2px solid #cbd5e1;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .form-group label {
             display: block;
             font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 13px;
+            margin-bottom: 4px;
+            font-size: 12px;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 9px;
+            padding: 8px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             font-size: 13px;
@@ -88,6 +112,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
+            font-size: 13px;
         }
 
         .btn-primary { background-color: #2563eb; color: white; }
@@ -96,37 +121,51 @@
         .btn-success { background-color: #16a34a; color: white; }
         .btn-success:hover { background-color: #15803d; }
 
-        .btn-excel { background-color: #15803d; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
-        .btn-pdf { background-color: #dc2626; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
-        .btn-pdf-daily { background-color: #d97706; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
+        .btn-excel { background-color: #15803d; color: white; padding: 8px 10px; font-size: 12px; }
+        .btn-pdf { background-color: #dc2626; color: white; padding: 8px 10px; font-size: 12px; }
+        .btn-pdf-daily { background-color: #d97706; color: white; padding: 8px 10px; font-size: 12px; }
 
         .toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            flex-wrap: wrap;
             gap: 10px;
+        }
+
+        .toolbar h3 {
+            font-size: 15px;
+        }
+
+        /* Mobile Scroll Wrapper for Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
         }
 
         .category-header {
             background-color: #334155;
             color: #fff;
             font-weight: bold;
-            padding: 8px 12px;
+            padding: 8px 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
-            font-size: 13px;
+            font-size: 12px;
+            min-width: 500px;
         }
 
         th, td {
-            padding: 8px 10px;
+            padding: 7px 9px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
 
         th {
@@ -141,27 +180,30 @@
         .status-green {
             background-color: #dcfce7;
             color: #15803d;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             font-weight: bold;
+            font-size: 11px;
             display: inline-block;
         }
 
         .status-yellow {
             background-color: #fef9c3;
             color: #a16207;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             font-weight: bold;
+            font-size: 11px;
             display: inline-block;
         }
 
         .status-red {
             background-color: #fee2e2;
             color: #b91c1c;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             font-weight: bold;
+            font-size: 11px;
             display: inline-block;
         }
 
@@ -247,50 +289,52 @@
         <div>
             <div class="toolbar">
                 <h3>📊 Inventory Summary Board</h3>
-                <div>
-                    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel (31-Day Breakup)</button>
+                <div class="toolbar-btns">
+                    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel (31-Day)</button>
                     <button class="btn btn-pdf" onclick="exportToPDF()">📄 Stock Summary PDF</button>
                     <button class="btn btn-pdf-daily" onclick="exportDailyLogPDF()">📄 Daily Log PDF</button>
                 </div>
             </div>
 
-            <table id="stockTable">
-                <thead>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Opening</th>
-                        <th>Total IN</th>
-                        <th>Total OUT</th>
-                        <th>Closing Stock</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="stockTableBody"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Opening</th>
+                            <th>Total IN</th>
+                            <th>Total OUT</th>
+                            <th>Closing Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody"></tbody>
+                </table>
+            </div>
 
-            <h3 style="margin-top: 30px; margin-bottom: 10px;">📋 Daily Transaction Log</h3>
-            <table id="logTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Item</th>
-                        <th>Type / Note</th>
-                        <th>Quantity</th>
-                        <th>Running Balance</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="logTableBody"></tbody>
-            </table>
+            <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 15px;">📋 Daily Transaction Log</h3>
+            <div class="table-responsive">
+                <table id="logTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Type / Note</th>
+                            <th>Quantity</th>
+                            <th>Running Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     const MANAGER_PASS = "George1919//";
-    
-    // ⚠️ கீழே உள்ள URL-க்கு பதிலாக உங்கள் Google Apps Script Web App URL-ஐ ஒட்டவும்
-    const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwinwBaSv4YZwHRUzCbFJt1bx9WmQpWbISruevGwePO3f2wb3AFXEuqnR35RCH-97HS/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -447,7 +491,6 @@
         renderTables();
     });
 
-    // Send Data to Google Sheets & Save Locally
     document.getElementById('transForm').addEventListener('submit', (e) => {
         e.preventDefault();
         if (!verifyPassword()) return;
@@ -467,12 +510,10 @@
             qty: qty
         };
 
-        // UI Save
         transactions.push({ id: Date.now(), date, itemId, type, qty });
         localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
 
-        // Sync to Google Sheets
-        if (SCRIPT_URL && SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+        if (SCRIPT_URL) {
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
