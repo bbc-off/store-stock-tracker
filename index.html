@@ -172,8 +172,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // ⚠️ ஒட்டவும்: உங்களுடைய புதிய Google Web App URL
-    const SCRIPT_URL = "YOUR_NEW_WEB_APP_URL_HERE";
+    // Connected with your New Google Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHV0qPwmYUsqIs74PrLrml8hhxt2IuIRuv0_RWure3BtMA2FB6zPspeY9LWSnZlQ96cA/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -282,9 +282,9 @@
         fetchFromGoogleSheets();
     });
 
-    // CORS Fix: Fetch Google Sheets data using JSONP Proxy
+    // Fetch Google Sheets data using JSONP Proxy to bypass browser CORS rules
     function fetchFromGoogleSheets() {
-        if (!SCRIPT_URL || SCRIPT_URL === "YOUR_NEW_WEB_APP_URL_HERE") {
+        if (!SCRIPT_URL) {
             renderTables();
             return;
         }
@@ -386,7 +386,7 @@
         transactions.push({ id: Date.now(), date, itemId, type, qty });
         localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
 
-        if (SCRIPT_URL && SCRIPT_URL !== "YOUR_NEW_WEB_APP_URL_HERE") {
+        if (SCRIPT_URL) {
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
