@@ -115,7 +115,6 @@
 
         .delete-btn { background: #ef4444; color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; }
 
-        /* Perfect Native Printing Styles */
         @media print {
             body { background: #fff !important; padding: 0 !important; }
             .container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; }
@@ -246,8 +245,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Your Updated Google Apps Script Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6AKQtD8w-7KtXk50RJCGgz_4LNiftKw9f1_BF53MXEvRzq2DGrtg7UVDSx0FZWJwYuw/exec";
+    // Connected with your New Google Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze25btJfiru6hLZxjY_pp8_HsspoPIrl6mFldqdCzRfQoBfc2WrKqs_Tj4XRlSI6Gmrw/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -353,8 +352,39 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         updateItemDropdown();
-        renderTables();
+        fetchFromGoogleSheets();
     });
+
+    // Fetch live data directly from Google Sheets
+    function fetchFromGoogleSheets() {
+        if (!SCRIPT_URL) {
+            renderTables();
+            return;
+        }
+
+        fetch(SCRIPT_URL)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    transactions = data.map((t, index) => {
+                        const item = masterItems.find(i => i.name.toLowerCase() === t.itemName.toLowerCase());
+                        return {
+                            id: Date.now() + index,
+                            date: t.date,
+                            itemId: item ? item.id : 1,
+                            type: t.type,
+                            qty: Number(t.qty)
+                        };
+                    });
+                    localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+                }
+                renderTables();
+            })
+            .catch(err => {
+                console.error("Error fetching from Sheets:", err);
+                renderTables();
+            });
+    }
 
     function verifyPassword() {
         const pass = prompt("Enter Manager Password:");
@@ -434,6 +464,7 @@
                 body: JSON.stringify(payload)
             }).then(() => {
                 console.log("Synced with Google Sheets!");
+                setTimeout(fetchFromGoogleSheets, 1000);
             }).catch(err => console.error("Sheets Sync Error: ", err));
         }
 
