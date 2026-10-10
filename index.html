@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockbuster Perling Store Stock Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 25px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #0f172a;
+            font-size: 15px;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background-color: #2563eb; color: white; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+
+        .btn-success { background-color: #16a34a; color: white; }
+        .btn-success:hover { background-color: #15803d; }
+
+        .btn-excel { background-color: #15803d; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
+        .btn-pdf { background-color: #dc2626; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
+        .btn-pdf-daily { background-color: #d97706; color: white; width: auto; padding: 8px 12px; font-size: 12px; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .category-header {
+            background-color: #334155;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .tag-in { color: #16a34a; font-weight: bold; }
+        .tag-out { color: #dc2626; font-weight: bold; }
+        .tag-pelangi { color: #d97706; font-weight: bold; }
+
+        .status-green {
+            background-color: #dcfce7;
+            color: #15803d;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-yellow {
+            background-color: #fef9c3;
+            color: #a16207;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎬 Blockbuster Perling Store Stock Inventory Tracker</h2>
+
+    <div class="grid-layout">
+        <div>
+            <div class="card">
+                <h3>🔄 1. Daily In / Out / Transfer Log</h3>
+                <form id="transForm">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="transDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Item</label>
+                        <select id="transItemSelect" required>
+                            <option value="">-- Select Item --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type / Destination</label>
+                        <select id="transType" required>
+                            <option value="IN">IN (Stock Received)</option>
+                            <option value="OUT">OUT (General Usage)</option>
+                            <option value="PELANGI">TO PELANGI (Transfer Out)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="transQty" min="1" placeholder="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="saveBtn">Save Entry</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>➕ 2. Set Opening Stock</h3>
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="newCat" onchange="populateItemDropdown()" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="POPCORN">POPCORN</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Meals items">Meals items</option>
+                            <option value="Cups">Cups</option>
+                            <option value="BOTTLE Drinks">BOTTLE Drinks</option>
+                            <option value="BIB">BIB</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        <select id="newItemSelect" required>
+                            <option value="">-- Select Category First --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Opening Stock</label>
+                        <input type="number" id="newOpeningStock" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Opening Stock</button>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="toolbar">
+                <h3>📊 Inventory Summary Board</h3>
+                <div>
+                    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel (31-Day Breakup)</button>
+                    <button class="btn btn-pdf" onclick="exportToPDF()">📄 Stock Summary PDF</button>
+                    <button class="btn btn-pdf-daily" onclick="exportDailyLogPDF()">📄 Daily Log PDF</button>
+                </div>
+            </div>
+
+            <table id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Opening</th>
+                        <th>Total IN</th>
+                        <th>Total OUT</th>
+                        <th>Closing Stock</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody"></tbody>
+            </table>
+
+            <h3 style="margin-top: 30px; margin-bottom: 10px;">📋 Daily Transaction Log</h3>
+            <table id="logTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item</th>
+                        <th>Type / Note</th>
+                        <th>Quantity</th>
+                        <th>Running Balance</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MANAGER_PASS = "George1919//";
+    
+    // ⚠️ கீழே உள்ள URL-க்கு பதிலாக உங்கள் Google Apps Script Web App URL-ஐ ஒட்டவும்
+    const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    document.getElementById('transDate').valueAsDate = new Date();
+
+    const defaultCategories = [
+        {
+            category: "POPCORN",
+            items: [
+                { name: "Caramel", high: 10 },
+                { name: "Seedcorn", high: 10 },
+                { name: "Popping oil", high: 10 },
+                { name: "Popcorn cup", high: 100 },
+                { name: "Popcorn box", high: 100 }
+            ]
+        },
+        {
+            category: "Snacks",
+            items: [
+                { name: "Chipster hot & spicy", high: 120 },
+                { name: "Super ring", high: 120 },
+                { name: "Twisties bbq", high: 120 },
+                { name: "Mamee", high: 120 },
+                { name: "Thumbs", high: 120 }
+            ]
+        },
+        {
+            category: "Meals items",
+            items: [
+                { name: "Naggets", high: 30, low: 20 },
+                { name: "Mini sausage", high: 30, low: 20 },
+                { name: "Chicken popcorn", high: 30, low: 20 },
+                { name: "Cheezy wedges", high: 30, low: 20 },
+                { name: "Onion Ring", high: 30, low: 20 },
+                { name: "Fries", high: 30, low: 20 },
+                { name: "Nachos cheese", high: 30, low: 20 },
+                { name: "Sweet corn", high: 30, low: 20 },
+                { name: "Karipap", high: 10, low: 5 },
+                { name: "Corndough", high: 10, low: 5 },
+                { name: "Ayam gunting", high: 10, low: 5 },
+                { name: "Meals box", high: 50, low: 50 }
+            ]
+        },
+        {
+            category: "Cups",
+            items: [
+                { name: "22oz cup", high: 5000 },
+                { name: "22oz lids", high: 5000 },
+                { name: "8 oz hot cup", high: 50, low: 30 },
+                { name: "Hot drink Lids", high: 50, low: 30 },
+                { name: "Sweetcorn cup", high: 50, low: 30 },
+                { name: "Sweet corn Lids", high: 50, low: 30 },
+                { name: "Milo cold cup", high: 50, low: 30 },
+                { name: "Milo cup Lids", high: 50, low: 30 }
+            ]
+        },
+        {
+            category: "BOTTLE Drinks",
+            items: [
+                { name: "F&N Zepple", high: 72 },
+                { name: "F&N Sarsi", high: 72 },
+                { name: "F&N Ice cream soda", high: 72 },
+                { name: "F&N Strawberry", high: 72 },
+                { name: "F&N Anggur", high: 72 },
+                { name: "100 PLUS", high: 72 },
+                { name: "Mineral Water", high: 72 }
+            ]
+        },
+        {
+            category: "BIB",
+            items: [
+                { name: "Lemon Tea", high: 5 },
+                { name: "Minute Maid Orange", high: 5 },
+                { name: "Sprite", high: 5 },
+                { name: "Anggur", high: 5 },
+                { name: "Cocacola (ORI)", high: 5 },
+                { name: "Cocacola (zero)", high: 5 },
+                { name: "Strawberry", high: 5 },
+                { name: "Co2", high: 5 }
+            ]
+        }
+    ];
+
+    let masterItems = JSON.parse(localStorage.getItem('blockbuster_masterItems_v5'));
+
+    if (!masterItems || masterItems.length === 0) {
+        masterItems = [];
+        let idCounter = 1;
+        defaultCategories.forEach(cat => {
+            cat.items.forEach(itemObj => {
+                masterItems.push({
+                    id: idCounter++,
+                    category: cat.category,
+                    name: itemObj.name,
+                    high: itemObj.high,
+                    low: itemObj.low || itemObj.high,
+                    opening: 0
+                });
+            });
+        });
+        localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
+    }
+
+    let transactions = JSON.parse(localStorage.getItem('blockbuster_transactions_v5')) || [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateItemDropdown();
+        renderTables();
+    });
+
+    function verifyPassword() {
+        const pass = prompt("Enter Manager Password:");
+        if (pass === MANAGER_PASS) {
+            return true;
+        } else {
+            alert("Incorrect Password! Access Denied.");
+            return false;
+        }
+    }
+
+    function populateItemDropdown() {
+        const catSelect = document.getElementById('newCat').value;
+        const itemSelect = document.getElementById('newItemSelect');
+        itemSelect.innerHTML = '<option value="">-- Select Item --</option>';
+
+        if (!catSelect) return;
+
+        const filtered = masterItems.filter(i => i.category === catSelect);
+        filtered.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.id;
+            opt.textContent = `${item.name} (Opening: ${item.opening})`;
+            itemSelect.appendChild(opt);
+        });
+    }
+
+    document.getElementById('addItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!verifyPassword()) return;
+
+        const itemId = parseInt(document.getElementById('newItemSelect').value);
+        const opening = parseInt(document.getElementById('newOpeningStock').value) || 0;
+
+        const item = masterItems.find(i => i.id === itemId);
+        if (item) {
+            item.opening = opening;
+            localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
+            alert(`${item.name} Opening Stock updated to ${opening}!`);
+        }
+
+        document.getElementById('newCat').value = '';
+        document.getElementById('newItemSelect').innerHTML = '<option value="">-- Select Category First --</option>';
+        document.getElementById('newOpeningStock').value = '0';
+
+        updateItemDropdown();
+        renderTables();
+    });
+
+    // Send Data to Google Sheets & Save Locally
+    document.getElementById('transForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!verifyPassword()) return;
+
+        const date = document.getElementById('transDate').value;
+        const itemId = parseInt(document.getElementById('transItemSelect').value);
+        const type = document.getElementById('transType').value;
+        const qty = parseInt(document.getElementById('transQty').value);
+
+        const item = masterItems.find(i => i.id === itemId);
+
+        const payload = {
+            date: date,
+            itemName: item ? item.name : 'Unknown',
+            category: item ? item.category : 'Unknown',
+            type: type,
+            qty: qty
+        };
+
+        // UI Save
+        transactions.push({ id: Date.now(), date, itemId, type, qty });
+        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+
+        // Sync to Google Sheets
+        if (SCRIPT_URL && SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                console.log("Synced with Google Sheets!");
+            }).catch(err => console.error("Sheets Sync Error: ", err));
+        }
+
+        document.getElementById('transQty').value = '';
+        renderTables();
+    });
+
+    function updateItemDropdown() {
+        const select = document.getElementById('transItemSelect');
+        select.innerHTML = '<option value="">-- Select Item --</option>';
+
+        const categories = [...new Set(masterItems.map(i => i.category))];
+        categories.forEach(cat => {
+            const optGroup = document.createElement('optgroup');
+            optGroup.label = cat;
+            masterItems.filter(i => i.category === cat).forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                optGroup.appendChild(opt);
+            });
+            select.appendChild(optGroup);
+        });
+    }
+
+    function calculateBalanceAtPoint(itemId, transId) {
+        const item = masterItems.find(i => i.id === itemId);
+        if (!item) return 0;
+
+        let balance = item.opening;
+        const chronologicalTrans = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
+
+        for (let t of chronologicalTrans) {
+            if (t.itemId === itemId) {
+                if (t.type === 'IN') {
+                    balance += t.qty;
+                } else if (t.type === 'OUT' || t.type === 'PELANGI') {
+                    balance -= t.qty;
+                }
+            }
+            if (t.id === transId) break;
+        }
+        return balance;
+    }
+
+    function renderTables() {
+        const stockBody = document.getElementById('stockTableBody');
+        const logBody = document.getElementById('logTableBody');
+
+        stockBody.innerHTML = '';
+        logBody.innerHTML = '';
+
+        const categories = [...new Set(masterItems.map(i => i.category))];
+
+        categories.forEach(cat => {
+            stockBody.innerHTML += `<tr><td colspan="6" class="category-header">📁 ${cat}</td></tr>`;
+
+            const catItems = masterItems.filter(i => i.category === cat);
+            catItems.forEach(item => {
+                const itemTrans = transactions.filter(t => t.itemId === item.id);
+                const totalIn = itemTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
+                const totalOut = itemTrans.filter(t => t.type === 'OUT' || t.type === 'PELANGI').reduce((a, b) => a + b.qty, 0);
+                const closingBalance = item.opening + totalIn - totalOut;
+
+                let statusBadge = '';
+                if (closingBalance >= item.high) {
+                    statusBadge = `<span class="status-green">Sufficient</span>`;
+                } else if (closingBalance > 0) {
+                    statusBadge = `<span class="status-yellow">Low Stock</span>`;
+                } else {
+                    statusBadge = `<span class="status-red">Out of Stock</span>`;
+                }
+
+                stockBody.innerHTML += `
+                    <tr>
+                        <td><b>${item.name}</b></td>
+                        <td>${item.opening}</td>
+                        <td class="tag-in">+${totalIn}</td>
+                        <td class="tag-out">-${totalOut}</td>
+                        <td><b>${closingBalance}</b></td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            });
+        });
+
+        const sortedTrans = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+        sortedTrans.forEach(t => {
+            const item = masterItems.find(i => i.id === t.itemId);
+            const itemName = item ? `${item.name} (${item.category})` : 'Unknown Item';
+
+            let typeLabel = '';
+            if (t.type === 'IN') typeLabel = `<span class="tag-in">IN</span>`;
+            else if (t.type === 'OUT') typeLabel = `<span class="tag-out">OUT</span>`;
+            else if (t.type === 'PELANGI') typeLabel = `<span class="tag-pelangi">To Pelangi</span>`;
+
+            const runningBalance = calculateBalanceAtPoint(t.itemId, t.id);
+
+            logBody.innerHTML += `
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${itemName}</td>
+                    <td>${typeLabel}</td>
+                    <td>${t.qty}</td>
+                    <td><b>${runningBalance}</b></td>
+                    <td><button class="delete-btn" onclick="deleteTrans(${t.id})">Delete</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function deleteTrans(id) {
+        if (!verifyPassword()) return;
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
+        renderTables();
+    }
+
+    function exportToExcel() {
+        if (!verifyPassword()) return;
+
+        const selectedMonth = prompt("Enter Month & Year for Excel Report (YYYY-MM):", new Date().toISOString().slice(0, 7));
+        if (!selectedMonth) return;
+
+        const [year, month] = selectedMonth.split('-').map(Number);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        const reportData = masterItems.map(item => {
+            const itemTrans = transactions.filter(t => t.itemId === item.id && t.date.startsWith(selectedMonth));
+            
+            let row = {
+                'Category': item.category,
+                'Item Name': item.name,
+                'Opening Stock': item.opening
+            };
+
+            let totalMonthIn = 0;
+            let totalMonthOut = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayStr = `${selectedMonth}-${String(day).padStart(2, '0')}`;
+                const dayTrans = itemTrans.filter(t => t.date === dayStr);
+
+                const dayIn = dayTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
+                const dayOut = dayTrans.filter(t => t.type === 'OUT' || t.type === 'PELANGI').reduce((a, b) => a + b.qty, 0);
+
+                totalMonthIn += dayIn;
+                totalMonthOut += dayOut;
+
+                row[`Day ${day} IN`] = dayIn || 0;
+                row[`Day ${day} OUT`] = dayOut || 0;
+            }
+
+            row['Total Month IN'] = totalMonthIn;
+            row['Total Month OUT'] = totalMonthOut;
+            row['Closing Balance'] = item.opening + totalMonthIn - totalMonthOut;
+
+            return row;
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(reportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${selectedMonth}`);
+        XLSX.writeFile(workbook, `Blockbuster_Stock_Breakup_${selectedMonth}.xlsx`);
+    }
+
+    function exportToPDF() {
+        const element = document.getElementById('stockTable');
+        const opt = {
+            margin:       8,
+            filename:     'Blockbuster_Stock_Summary.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    function exportDailyLogPDF() {
+        const selectedMonth = prompt("Enter Month & Year for Daily Log PDF (YYYY-MM):", new Date().toISOString().slice(0, 7));
+        if (!selectedMonth) return;
+
+        const monthTrans = transactions.filter(t => t.date.startsWith(selectedMonth))
+                                       .sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
+
+        if (monthTrans.length === 0) {
+            alert("No transactions found for this month!");
+            return;
+        }
+
+        let pdfContainer = document.createElement('div');
+        pdfContainer.style.padding = '15px';
+        pdfContainer.style.fontFamily = 'sans-serif';
+
+        let htmlContent = `
+            <h2 style="text-align: center; color: #1e293b;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
+            <h4 style="text-align: center; color: #64748b; margin-bottom: 20px;">Month: ${selectedMonth}</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #1e293b; color: white;">
+                        <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Item Name</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Type / Destination</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Quantity</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Remaining Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        monthTrans.forEach(t => {
+            const item = masterItems.find(i => i.id === t.itemId);
+            const itemName = item ? `${item.name} (${item.category})` : 'Unknown Item';
+            let typeText = t.type === 'IN' ? 'IN' : (t.type === 'PELANGI' ? 'To Pelangi' : 'OUT');
+            const runningBalance = calculateBalanceAtPoint(t.itemId, t.id);
+
+            htmlContent += `
+                <tr>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${t.date}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${itemName}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${typeText}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${t.qty}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd; font-weight: bold;">${runningBalance}</td>
+                </tr>
+            `;
+        });
+
+        htmlContent += `</tbody></table>`;
+        pdfContainer.innerHTML = htmlContent;
+
+        const opt = {
+            margin:       10,
+            filename:     `Blockbuster_Daily_Transactions_${selectedMonth}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(pdfContainer).save();
+    }
+</script>
+
+</body>
+</html>
