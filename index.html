@@ -172,12 +172,6 @@
             color: white;
         }
 
-        /* Prevents Row Cuts in PDF Generation */
-        tr {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-        }
-
         .tag-in { color: #16a34a; font-weight: bold; }
         .tag-out { color: #dc2626; font-weight: bold; }
         .tag-pelangi { color: #d97706; font-weight: bold; }
@@ -692,35 +686,78 @@
         XLSX.writeFile(workbook, `Blockbuster_Stock_Breakup_${selectedMonth}.xlsx`);
     }
 
-    // Fixed PDF Export with clean pagination & no row-clipping
+    // Complete Clean PDF Generator (Guarantees No Row Cuts & Includes All Items)
     function exportToPDF() {
-        const table = document.getElementById('stockTable');
-        
         let pdfContainer = document.createElement('div');
-        pdfContainer.style.padding = '15px';
-        pdfContainer.style.fontFamily = 'Segoe UI, Tahoma, sans-serif';
+        pdfContainer.style.width = '700px';
+        pdfContainer.style.padding = '20px';
+        pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
 
-        pdfContainer.innerHTML = `
-            <h2 style="text-align: center; color: #1e293b; margin-bottom: 15px;">🎬 Blockbuster Perling - Stock Inventory Summary Report</h2>
-            <div style="width: 100%;">
-                ${table.outerHTML}
-            </div>
+        let htmlContent = `
+            <h2 style="text-align: center; color: #1e293b; margin-bottom: 5px; font-size: 18px;">🎬 Blockbuster Perling Store Stock Summary</h2>
+            <p style="text-align: center; color: #64748b; font-size: 11px; margin-bottom: 15px;">Generated on: ${new Date().toLocaleDateString()}</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #1e293b; color: white;">
+                        <th style="padding: 6px; text-align: left; border: 1px solid #cbd5e1;">Item Name</th>
+                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Opening</th>
+                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Total IN</th>
+                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Total OUT</th>
+                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 70px;">Closing</th>
+                        <th style="padding: 6px; text-align: center; border: 1px solid #cbd5e1; width: 90px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
         `;
 
-        // Style tables specifically for PDF rendering
-        const pdfTable = pdfContainer.querySelector('table');
-        pdfTable.style.width = '100%';
-        pdfTable.style.fontSize = '11px';
-        pdfTable.style.borderCollapse = 'collapse';
+        const categories = [...new Set(masterItems.map(i => i.category))];
 
-        const cells = pdfContainer.querySelectorAll('th, td');
-        cells.forEach(cell => {
-            cell.style.padding = '5px 8px';
-            cell.style.border = '1px solid #cbd5e1';
+        categories.forEach(cat => {
+            htmlContent += `
+                <tr style="page-break-inside: avoid; break-inside: avoid;">
+                    <td colspan="6" style="background-color: #334155; color: white; font-weight: bold; padding: 6px 8px; border: 1px solid #cbd5e1;">📁 ${cat}</td>
+                </tr>
+            `;
+
+            const catItems = masterItems.filter(i => i.category === cat);
+            catItems.forEach(item => {
+                const itemTrans = transactions.filter(t => t.itemId === item.id);
+                const totalIn = itemTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
+                const totalOut = itemTrans.filter(t => t.type === 'OUT' || t.type === 'PELANGI').reduce((a, b) => a + b.qty, 0);
+                const closingBalance = item.opening + totalIn - totalOut;
+
+                let statusText = '';
+                let statusBg = '';
+                let statusColor = '';
+
+                if (closingBalance >= item.high) {
+                    statusText = 'Sufficient'; statusBg = '#dcfce7'; statusColor = '#15803d';
+                } else if (closingBalance > 0) {
+                    statusText = 'Low Stock'; statusBg = '#fef9c3'; statusColor = '#a16207';
+                } else {
+                    statusText = 'Out of Stock'; statusBg = '#fee2e2'; statusColor = '#b91c1c';
+                }
+
+                htmlContent += `
+                    <tr style="page-break-inside: avoid; break-inside: avoid;">
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; font-weight: 600;">${item.name}</td>
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">${item.opening}</td>
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; color: #16a34a; font-weight: bold;">+${totalIn}</td>
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; color: #dc2626; font-weight: bold;">-${totalOut}</td>
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${closingBalance}</td>
+                        <td style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">
+                            <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${statusText}</span>
+                        </td>
+                    </tr>
+                `;
+            });
         });
 
+        htmlContent += `</tbody></table>`;
+        pdfContainer.innerHTML = htmlContent;
+
         const opt = {
-            margin:       [10, 8, 10, 8],
+            margin:       [10, 10, 10, 10],
             filename:     'Blockbuster_Stock_Summary.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
@@ -744,20 +781,21 @@
         }
 
         let pdfContainer = document.createElement('div');
-        pdfContainer.style.padding = '15px';
-        pdfContainer.style.fontFamily = 'Segoe UI, Tahoma, sans-serif';
+        pdfContainer.style.width = '700px';
+        pdfContainer.style.padding = '20px';
+        pdfContainer.style.fontFamily = 'Segoe UI, Arial, sans-serif';
 
         let htmlContent = `
-            <h2 style="text-align: center; color: #1e293b;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
-            <h4 style="text-align: center; color: #64748b; margin-bottom: 15px;">Month: ${selectedMonth}</h4>
+            <h2 style="text-align: center; color: #1e293b; font-size: 18px;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
+            <h4 style="text-align: center; color: #64748b; margin-bottom: 15px; font-size: 13px;">Month: ${selectedMonth}</h4>
             <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                     <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 6px; border: 1px solid #ddd;">Date</th>
-                        <th style="padding: 6px; border: 1px solid #ddd;">Item Name</th>
-                        <th style="padding: 6px; border: 1px solid #ddd;">Type / Destination</th>
-                        <th style="padding: 6px; border: 1px solid #ddd;">Quantity</th>
-                        <th style="padding: 6px; border: 1px solid #ddd;">Remaining Balance</th>
+                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Date</th>
+                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Item Name</th>
+                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Type / Destination</th>
+                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Quantity</th>
+                        <th style="padding: 6px; border: 1px solid #cbd5e1;">Remaining Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -770,12 +808,12 @@
             const runningBalance = calculateBalanceAtPoint(t.itemId, t.id);
 
             htmlContent += `
-                <tr style="page-break-inside: avoid;">
-                    <td style="padding: 5px; border: 1px solid #ddd;">${t.date}</td>
-                    <td style="padding: 5px; border: 1px solid #ddd;">${itemName}</td>
-                    <td style="padding: 5px; border: 1px solid #ddd;">${typeText}</td>
-                    <td style="padding: 5px; border: 1px solid #ddd;">${t.qty}</td>
-                    <td style="padding: 5px; border: 1px solid #ddd; font-weight: bold;">${runningBalance}</td>
+                <tr style="page-break-inside: avoid; break-inside: avoid;">
+                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${t.date}</td>
+                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${itemName}</td>
+                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${typeText}</td>
+                    <td style="padding: 5px; border: 1px solid #cbd5e1;">${t.qty}</td>
+                    <td style="padding: 5px; border: 1px solid #cbd5e1; font-weight: bold;">${runningBalance}</td>
                 </tr>
             `;
         });
@@ -784,7 +822,7 @@
         pdfContainer.innerHTML = htmlContent;
 
         const opt = {
-            margin:       [10, 8, 10, 8],
+            margin:       [10, 10, 10, 10],
             filename:     `Blockbuster_Daily_Transactions_${selectedMonth}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
