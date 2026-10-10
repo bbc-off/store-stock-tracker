@@ -137,7 +137,6 @@
             font-size: 15px;
         }
 
-        /* Mobile Scroll Wrapper for Tables */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -171,6 +170,12 @@
         th {
             background-color: #1e293b;
             color: white;
+        }
+
+        /* Prevents Row Cuts in PDF Generation */
+        tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
 
         .tag-in { color: #16a34a; font-weight: bold; }
@@ -687,16 +692,43 @@
         XLSX.writeFile(workbook, `Blockbuster_Stock_Breakup_${selectedMonth}.xlsx`);
     }
 
+    // Fixed PDF Export with clean pagination & no row-clipping
     function exportToPDF() {
-        const element = document.getElementById('stockTable');
+        const table = document.getElementById('stockTable');
+        
+        let pdfContainer = document.createElement('div');
+        pdfContainer.style.padding = '15px';
+        pdfContainer.style.fontFamily = 'Segoe UI, Tahoma, sans-serif';
+
+        pdfContainer.innerHTML = `
+            <h2 style="text-align: center; color: #1e293b; margin-bottom: 15px;">🎬 Blockbuster Perling - Stock Inventory Summary Report</h2>
+            <div style="width: 100%;">
+                ${table.outerHTML}
+            </div>
+        `;
+
+        // Style tables specifically for PDF rendering
+        const pdfTable = pdfContainer.querySelector('table');
+        pdfTable.style.width = '100%';
+        pdfTable.style.fontSize = '11px';
+        pdfTable.style.borderCollapse = 'collapse';
+
+        const cells = pdfContainer.querySelectorAll('th, td');
+        cells.forEach(cell => {
+            cell.style.padding = '5px 8px';
+            cell.style.border = '1px solid #cbd5e1';
+        });
+
         const opt = {
-            margin:       8,
+            margin:       [10, 8, 10, 8],
             filename:     'Blockbuster_Stock_Summary.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
-        html2pdf().set(opt).from(element).save();
+
+        html2pdf().set(opt).from(pdfContainer).save();
     }
 
     function exportDailyLogPDF() {
@@ -713,19 +745,19 @@
 
         let pdfContainer = document.createElement('div');
         pdfContainer.style.padding = '15px';
-        pdfContainer.style.fontFamily = 'sans-serif';
+        pdfContainer.style.fontFamily = 'Segoe UI, Tahoma, sans-serif';
 
         let htmlContent = `
             <h2 style="text-align: center; color: #1e293b;">🎬 Blockbuster Perling - Daily Transaction Report</h2>
-            <h4 style="text-align: center; color: #64748b; margin-bottom: 20px;">Month: ${selectedMonth}</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <h4 style="text-align: center; color: #64748b; margin-bottom: 15px;">Month: ${selectedMonth}</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                     <tr style="background-color: #1e293b; color: white;">
-                        <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
-                        <th style="padding: 8px; border: 1px solid #ddd;">Item Name</th>
-                        <th style="padding: 8px; border: 1px solid #ddd;">Type / Destination</th>
-                        <th style="padding: 8px; border: 1px solid #ddd;">Quantity</th>
-                        <th style="padding: 8px; border: 1px solid #ddd;">Remaining Balance</th>
+                        <th style="padding: 6px; border: 1px solid #ddd;">Date</th>
+                        <th style="padding: 6px; border: 1px solid #ddd;">Item Name</th>
+                        <th style="padding: 6px; border: 1px solid #ddd;">Type / Destination</th>
+                        <th style="padding: 6px; border: 1px solid #ddd;">Quantity</th>
+                        <th style="padding: 6px; border: 1px solid #ddd;">Remaining Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -738,12 +770,12 @@
             const runningBalance = calculateBalanceAtPoint(t.itemId, t.id);
 
             htmlContent += `
-                <tr>
-                    <td style="padding: 6px; border: 1px solid #ddd;">${t.date}</td>
-                    <td style="padding: 6px; border: 1px solid #ddd;">${itemName}</td>
-                    <td style="padding: 6px; border: 1px solid #ddd;">${typeText}</td>
-                    <td style="padding: 6px; border: 1px solid #ddd;">${t.qty}</td>
-                    <td style="padding: 6px; border: 1px solid #ddd; font-weight: bold;">${runningBalance}</td>
+                <tr style="page-break-inside: avoid;">
+                    <td style="padding: 5px; border: 1px solid #ddd;">${t.date}</td>
+                    <td style="padding: 5px; border: 1px solid #ddd;">${itemName}</td>
+                    <td style="padding: 5px; border: 1px solid #ddd;">${typeText}</td>
+                    <td style="padding: 5px; border: 1px solid #ddd;">${t.qty}</td>
+                    <td style="padding: 5px; border: 1px solid #ddd; font-weight: bold;">${runningBalance}</td>
                 </tr>
             `;
         });
@@ -752,11 +784,12 @@
         pdfContainer.innerHTML = htmlContent;
 
         const opt = {
-            margin:       10,
+            margin:       [10, 8, 10, 8],
             filename:     `Blockbuster_Daily_Transactions_${selectedMonth}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         html2pdf().set(opt).from(pdfContainer).save();
