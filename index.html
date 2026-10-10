@@ -172,7 +172,7 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Connected with your New Google Web App URL
+    // Connected with your Google Web App URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlrlx3bfYnit3buvuKCJ1DQ4OmJ90DJKhAuwdVhJUZyTre2ldmL7TqgcjJOnQCLfVG/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
@@ -255,27 +255,22 @@
         }
     ];
 
-    let masterItems = JSON.parse(localStorage.getItem('blockbuster_masterItems_v5'));
-
-    if (!masterItems || masterItems.length === 0) {
-        masterItems = [];
-        let idCounter = 1;
-        defaultCategories.forEach(cat => {
-            cat.items.forEach(itemObj => {
-                masterItems.push({
-                    id: idCounter++,
-                    category: cat.category,
-                    name: itemObj.name,
-                    high: itemObj.high,
-                    low: itemObj.low || itemObj.high,
-                    opening: 0
-                });
+    let masterItems = [];
+    let idCounter = 1;
+    defaultCategories.forEach(cat => {
+        cat.items.forEach(itemObj => {
+            masterItems.push({
+                id: idCounter++,
+                category: cat.category,
+                name: itemObj.name,
+                high: itemObj.high,
+                low: itemObj.low || itemObj.high,
+                opening: 0
             });
         });
-        localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
-    }
+    });
 
-    let transactions = JSON.parse(localStorage.getItem('blockbuster_transactions_v5')) || [];
+    let transactions = [];
 
     document.addEventListener('DOMContentLoaded', () => {
         updateItemDropdown();
@@ -283,51 +278,77 @@
         fetchFromGoogleSheets();
     });
 
+    // Direct Cross-Origin Fetching Strategy
     function fetchFromGoogleSheets() {
         if (!SCRIPT_URL) return;
 
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(SCRIPT_URL);
-
-        fetch(proxyUrl)
-            .then(response => {
-                if (!response.ok) throw new Error("Network error");
-                return response.json();
-            })
+        fetch(SCRIPT_URL + "?cache=" + new Date().getTime())
+            .then(response => response.json())
             .then(data => {
-                try {
-                    let parsed = JSON.parse(data.contents);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        
-                        // Parse OPENING stock and transactions from Google Sheet
-                        parsed.forEach(t => {
-                            const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
-                            if (item && t.type === 'OPENING') {
-                                item.opening = Number(t.qty);
-                            }
-                        });
-                        localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
+                if (Array.isArray(data) && data.length > 0) {
+                    
+                    // Reset Master Items Opening
+                    masterItems.forEach(i => i.opening = 0);
 
-                        transactions = parsed.filter(t => t.type !== 'OPENING').map((t, index) => {
-                            const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
-                            return {
-                                id: Date.now() + index,
-                                date: t.date,
-                                itemId: item ? item.id : 1,
-                                type: t.type,
-                                qty: Number(t.qty)
-                            };
-                        });
-                        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
-                        
-                        renderTables();
-                    }
-                } catch(e) {
-                    console.log("Sheet empty or parse error");
+                    // Parse OPENING stock and transactions from Live Sheet Data
+                    data.forEach(t => {
+                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        if (item && String(t.type).trim().toUpperCase() === 'OPENING') {
+                            item.opening = Number(t.qty);
+                        }
+                    });
+
+                    transactions = data.filter(t => String(t.type).trim().toUpperCase() !== 'OPENING').map((t, index) => {
+                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        return {
+                            id: Date.now() + index,
+                            date: t.date,
+                            itemId: item ? item.id : 1,
+                            type: t.type,
+                            qty: Number(t.qty)
+                        };
+                    });
+
+                    localStorage.setItem('blockbuster_masterItems_v6', JSON.stringify(masterItems));
+                    localStorage.setItem('blockbuster_transactions_v6', JSON.stringify(transactions));
+                    
+                    renderTables();
                 }
             })
             .catch(err => {
-                console.log("Error loading sheet:", err);
+                console.log("Direct Fetch Error, trying proxy...");
+                fetchViaProxy();
             });
+    }
+
+    function fetchViaProxy() {
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(SCRIPT_URL);
+        fetch(proxyUrl)
+            .then(res => res.json())
+            .then(data => {
+                let parsed = JSON.parse(data.contents);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    masterItems.forEach(i => i.opening = 0);
+                    parsed.forEach(t => {
+                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        if (item && String(t.type).trim().toUpperCase() === 'OPENING') {
+                            item.opening = Number(t.qty);
+                        }
+                    });
+
+                    transactions = parsed.filter(t => String(t.type).trim().toUpperCase() !== 'OPENING').map((t, index) => {
+                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        return {
+                            id: Date.now() + index,
+                            date: t.date,
+                            itemId: item ? item.id : 1,
+                            type: t.type,
+                            qty: Number(t.qty)
+                        };
+                    });
+                    renderTables();
+                }
+            }).catch(e => console.log("Proxy load error:", e));
     }
 
     function verifyPassword() {
@@ -366,9 +387,7 @@
         const item = masterItems.find(i => i.id === itemId);
         if (item) {
             item.opening = opening;
-            localStorage.setItem('blockbuster_masterItems_v5', JSON.stringify(masterItems));
 
-            // Sync Opening Stock directly to Google Sheets
             const todayStr = new Date().toISOString().slice(0, 10);
             const payload = {
                 date: todayStr,
@@ -385,9 +404,8 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 }).then(() => {
-                    console.log("Opening Stock Synced to Google Sheets!");
                     setTimeout(fetchFromGoogleSheets, 1200);
-                }).catch(err => console.error("Sheets Opening Stock Sync Error: ", err));
+                });
             }
 
             alert(`${item.name} Opening Stock updated to ${opening} and saved to Google Sheet!`);
@@ -421,7 +439,6 @@
         };
 
         transactions.push({ id: Date.now(), date, itemId, type, qty });
-        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
 
         if (SCRIPT_URL) {
             fetch(SCRIPT_URL, {
@@ -430,9 +447,8 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                console.log("Synced with Google Sheets!");
                 setTimeout(fetchFromGoogleSheets, 1200);
-            }).catch(err => console.error("Sheets Sync Error: ", err));
+            });
         }
 
         document.getElementById('transQty').value = '';
@@ -546,7 +562,6 @@
     function deleteTrans(id) {
         if (!verifyPassword()) return;
         transactions = transactions.filter(t => t.id !== id);
-        localStorage.setItem('blockbuster_transactions_v5', JSON.stringify(transactions));
         renderTables();
     }
 
@@ -601,9 +616,7 @@
     function exportToPDF() {
         document.getElementById('logTable').closest('.table-responsive').style.display = 'none';
         document.querySelector('h3[style*="margin-top: 25px"]').style.display = 'none';
-        
         window.print();
-        
         document.getElementById('logTable').closest('.table-responsive').style.display = 'block';
         document.querySelector('h3[style*="margin-top: 25px"]').style.display = 'block';
     }
@@ -611,9 +624,7 @@
     function exportDailyLogPDF() {
         document.getElementById('stockTable').closest('.table-responsive').style.display = 'none';
         document.querySelector('.toolbar h3').style.display = 'none';
-        
         window.print();
-        
         document.getElementById('stockTable').closest('.table-responsive').style.display = 'block';
         document.querySelector('.toolbar h3').style.display = 'block';
     }
