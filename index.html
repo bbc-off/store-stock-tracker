@@ -24,6 +24,7 @@
         .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 13px; }
         .btn-primary { background-color: #2563eb; color: white; }
         .btn-success { background-color: #16a34a; color: white; }
+        .btn-purple { background-color: #9333ea; color: white; }
         .btn-excel { background-color: #15803d; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf { background-color: #dc2626; color: white; padding: 8px 10px; font-size: 12px; }
         .btn-pdf-daily { background-color: #d97706; color: white; padding: 8px 10px; font-size: 12px; }
@@ -94,7 +95,7 @@
             </div>
 
             <div class="card">
-                <h3>➕ 2. Set Opening Stock</h3>
+                <h3>⚙️ 2. Set Opening Stock</h3>
                 <form id="addItemForm">
                     <div class="form-group">
                         <label>Category</label>
@@ -119,6 +120,34 @@
                         <input type="number" id="newOpeningStock" min="0" value="0" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Opening Stock</button>
+                </form>
+            </div>
+
+            <!-- CARD 3: Add New Item to Category -->
+            <div class="card">
+                <h3>➕ 3. Add New Item to Category</h3>
+                <form id="addNewItemForm">
+                    <div class="form-group">
+                        <label>Select Category</label>
+                        <select id="addCustomCat" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="POPCORN">POPCORN</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Meals items">Meals items</option>
+                            <option value="Cups">Cups</option>
+                            <option value="BOTTLE Drinks">BOTTLE Drinks</option>
+                            <option value="BIB">BIB</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>New Item Name</label>
+                        <input type="text" id="addCustomName" placeholder="e.g. Cheese Popcorn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Opening Stock</label>
+                        <input type="number" id="addCustomOpening" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-purple">Add Item to Inventory</button>
                 </form>
             </div>
         </div>
@@ -172,8 +201,8 @@
 <script>
     const MANAGER_PASS = "George1919//";
     
-    // Connected with your Google Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlrlx3bfYnit3buvuKCJ1DQ4OmJ90DJKhAuwdVhJUZyTre2ldmL7TqgcjJOnQCLfVG/exec";
+    // Connected with your New Google Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVzucilfR9yf4vy0Vb11fWBxwwaxMyPIxzpnfyu-Lv4oCrb5UygzNyJkBaGVxuaKmE/exec";
 
     document.getElementById('transDate').valueAsDate = new Date();
 
@@ -278,7 +307,6 @@
         fetchFromGoogleSheets();
     });
 
-    // Direct Cross-Origin Fetching Strategy
     function fetchFromGoogleSheets() {
         if (!SCRIPT_URL) return;
 
@@ -287,12 +315,25 @@
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     
-                    // Reset Master Items Opening
                     masterItems.forEach(i => i.opening = 0);
 
-                    // Parse OPENING stock and transactions from Live Sheet Data
                     data.forEach(t => {
-                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        const itemNameClean = String(t.itemName).trim();
+                        let item = masterItems.find(i => i.name.trim().toLowerCase() === itemNameClean.toLowerCase());
+                        
+                        // Dynamically add new item if not in default master list
+                        if (!item && itemNameClean) {
+                            item = {
+                                id: idCounter++,
+                                category: t.category || "General",
+                                name: itemNameClean,
+                                high: 10,
+                                low: 5,
+                                opening: 0
+                            };
+                            masterItems.push(item);
+                        }
+
                         if (item && String(t.type).trim().toUpperCase() === 'OPENING') {
                             item.opening = Number(t.qty);
                         }
@@ -309,14 +350,11 @@
                         };
                     });
 
-                    localStorage.setItem('blockbuster_masterItems_v6', JSON.stringify(masterItems));
-                    localStorage.setItem('blockbuster_transactions_v6', JSON.stringify(transactions));
-                    
+                    updateItemDropdown();
                     renderTables();
                 }
             })
             .catch(err => {
-                console.log("Direct Fetch Error, trying proxy...");
                 fetchViaProxy();
             });
     }
@@ -330,7 +368,21 @@
                 if (Array.isArray(parsed) && parsed.length > 0) {
                     masterItems.forEach(i => i.opening = 0);
                     parsed.forEach(t => {
-                        const item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        const itemNameClean = String(t.itemName).trim();
+                        let item = masterItems.find(i => i.name.trim().toLowerCase() === itemNameClean.toLowerCase());
+                        
+                        if (!item && itemNameClean) {
+                            item = {
+                                id: idCounter++,
+                                category: t.category || "General",
+                                name: itemNameClean,
+                                high: 10,
+                                low: 5,
+                                opening: 0
+                            };
+                            masterItems.push(item);
+                        }
+
                         if (item && String(t.type).trim().toUpperCase() === 'OPENING') {
                             item.opening = Number(t.qty);
                         }
@@ -346,6 +398,7 @@
                             qty: Number(t.qty)
                         };
                     });
+                    updateItemDropdown();
                     renderTables();
                 }
             }).catch(e => console.log("Proxy load error:", e));
@@ -376,6 +429,65 @@
             itemSelect.appendChild(opt);
         });
     }
+
+    // Add Brand New Custom Item to Google Sheet & Inventory
+    document.getElementById('addNewItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!verifyPassword()) return;
+
+        const category = document.getElementById('addCustomCat').value;
+        const name = document.getElementById('addCustomName').value.trim();
+        const opening = parseInt(document.getElementById('addCustomOpening').value) || 0;
+
+        if (!name) return;
+
+        let existing = masterItems.find(i => i.name.toLowerCase() === name.toLowerCase());
+        if (existing) {
+            alert("This item already exists!");
+            return;
+        }
+
+        const newItem = {
+            id: idCounter++,
+            category: category,
+            name: name,
+            high: 10,
+            low: 5,
+            opening: opening
+        };
+
+        masterItems.push(newItem);
+
+        // Send to Google Sheet
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const payload = {
+            date: todayStr,
+            itemName: name,
+            category: category,
+            type: 'OPENING',
+            qty: opening
+        };
+
+        if (SCRIPT_URL) {
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                setTimeout(fetchFromGoogleSheets, 1200);
+            });
+        }
+
+        alert(`New Item '${name}' added to Category '${category}' with Opening Stock ${opening}!`);
+
+        document.getElementById('addCustomCat').value = '';
+        document.getElementById('addCustomName').value = '';
+        document.getElementById('addCustomOpening').value = '0';
+
+        updateItemDropdown();
+        renderTables();
+    });
 
     document.getElementById('addItemForm').addEventListener('submit', (e) => {
         e.preventDefault();
