@@ -9,15 +9,47 @@
         body { background-color: #f0f2f5; padding: 10px; color: #333; }
         .container { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
-        /* Top Navigation Header */
-        .top-header { display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: white; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .top-header h2 { font-size: 16px; margin: 0; display: flex; align-items: center; gap: 8px; }
-        .nav-btn { background: #ea580c; color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; transition: 0.2s; white-space: nowrap; }
+        /* Clean Header Section without Dark Box */
+        .page-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-bottom: 12px; 
+            margin-bottom: 18px; 
+            border-bottom: 2px solid #e2e8f0; 
+            gap: 10px;
+        }
+        .page-header h2 { 
+            font-size: 15px; 
+            color: #0f172a; 
+            font-weight: 700;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .nav-btn { 
+            background: #ea580c; 
+            color: white; 
+            text-decoration: none; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 12px; 
+            white-space: nowrap; 
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(234, 88, 12, 0.2);
+            transition: 0.2s;
+        }
         .nav-btn:hover { background: #c2410c; }
         
         .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
         @media (max-width: 900px) {
-            body { padding: 5px; } .container { padding: 12px; } .grid-layout { grid-template-columns: 1fr; }
+            body { padding: 5px; } 
+            .container { padding: 10px; } 
+            .grid-layout { grid-template-columns: 1fr; }
+            .page-header h2 { font-size: 14px; }
+            .nav-btn { padding: 5px 10px; font-size: 11px; }
             .toolbar { flex-direction: column; align-items: flex-start !important; }
             .toolbar-btns { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
         }
@@ -50,9 +82,9 @@
 <body>
 
 <div class="container">
-    <!-- Top Header Bar with Concession Sales Link -->
-    <div class="top-header">
-        <h2>🎬 Store Stock Inventory Tracker</h2>
+    <!-- Header with Title on Left and Button on Right -->
+    <div class="page-header">
+        <h2>🎬 Store Stock Inventory</h2>
         <a href="sales.html" class="nav-btn">🍿 Concession Sales ➔</a>
     </div>
 
