@@ -8,11 +8,40 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
         body { background-color: #f0f2f5; padding: 10px; color: #333; }
         .container { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .top-nav { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
         .top-nav h2 { font-size: 18px; margin: 0; }
-        .nav-btn { background: #2563eb; color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 13px; transition: 0.2s; }
-        .nav-btn:hover { background: #1d4ed8; }
         
+        /* 🏷️ Floating Side Tab (File Index Style) */
+        .side-tab-btn {
+            position: fixed;
+            right: 0;
+            top: 35%;
+            transform: translateY(-50%);
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            padding: 14px 10px;
+            border-radius: 10px 0 0 10px;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: -3px 4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            border: 2px solid #ffffff;
+            border-right: none;
+            transition: all 0.2s ease;
+        }
+        .side-tab-btn:hover, .side-tab-btn:active {
+            background: #1d4ed8;
+            padding-left: 14px;
+        }
+
         .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
         @media (max-width: 900px) {
             body { padding: 5px; } .container { padding: 12px; } .grid-layout { grid-template-columns: 1fr; }
@@ -47,10 +76,14 @@
 </head>
 <body>
 
+<!-- 🏷️ Floating Side Tab (File Organizer Index Style) -->
+<a href="sales.html" class="side-tab-btn">
+    🍿 CONCESSION SALES ➔
+</a>
+
 <div class="container">
     <div class="top-nav">
         <h2>🎬 Store Stock Inventory Tracker</h2>
-        <a href="sales.html" class="nav-btn">🍿 Go to Concession Daily Sales ➔</a>
     </div>
 
     <div class="grid-layout">
@@ -133,105 +166,4 @@
     let idCounter = 1;
     defaultCategories.forEach(cat => {
         cat.items.forEach(itemObj => {
-            masterItems.push({ id: idCounter++, category: cat.category, name: itemObj.name, high: itemObj.high, low: 5, opening: 0 });
-        });
-    });
-
-    let transactions = [];
-
-    document.addEventListener('DOMContentLoaded', () => {
-        updateItemDropdown();
-        renderTables(); 
-        fetchFromGoogleSheets();
-    });
-
-    function fetchFromGoogleSheets() {
-        if (!SCRIPT_URL) return;
-        fetch(SCRIPT_URL + "?cache=" + new Date().getTime())
-            .then(res => res.json())
-            .then(data => {
-                let invData = data.inventory || data;
-                if (Array.isArray(invData) && invData.length > 0) {
-                    masterItems.forEach(i => i.opening = 0);
-                    invData.forEach(t => {
-                        let item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
-                        if (!item && t.itemName) {
-                            item = { id: idCounter++, category: t.category || "General", name: t.itemName, high: 10, low: 5, opening: 0 };
-                            masterItems.push(item);
-                        }
-                        if (item && String(t.type).trim().toUpperCase() === 'OPENING') item.opening = Number(t.qty);
-                    });
-                    transactions = invData.filter(t => String(t.type).trim().toUpperCase() !== 'OPENING').map((t, idx) => {
-                        let item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
-                        return { id: Date.now() + idx, date: t.date, itemId: item ? item.id : 1, type: t.type, qty: Number(t.qty) };
-                    });
-                    updateItemDropdown();
-                    renderTables();
-                }
-            }).catch(e => console.log("Fetch error", e));
-    }
-
-    function verifyPassword() {
-        return prompt("Enter Manager Password:") === MANAGER_PASS ? true : (alert("Incorrect Password!"), false);
-    }
-
-    function updateItemDropdown() {
-        const select = document.getElementById('transItemSelect');
-        select.innerHTML = '<option value="">-- Select Item --</option>';
-        const categories = [...new Set(masterItems.map(i => i.category))];
-        categories.forEach(cat => {
-            const og = document.createElement('optgroup'); og.label = cat;
-            masterItems.filter(i => i.category === cat).forEach(item => {
-                let opt = document.createElement('option'); opt.value = item.id; opt.textContent = item.name;
-                og.appendChild(opt);
-            });
-            select.appendChild(og);
-        });
-    }
-
-    document.getElementById('transForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!verifyPassword()) return;
-        const date = document.getElementById('transDate').value;
-        const itemId = parseInt(document.getElementById('transItemSelect').value);
-        const type = document.getElementById('transType').value;
-        const qty = parseInt(document.getElementById('transQty').value);
-        const item = masterItems.find(i => i.id === itemId);
-
-        transactions.push({ id: Date.now(), date, itemId, type, qty });
-        if (SCRIPT_URL) {
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ date, itemName: item.name, category: item.category, type, qty }) }).then(() => setTimeout(fetchFromGoogleSheets, 1200));
-        }
-        document.getElementById('transQty').value = '';
-        renderTables();
-    });
-
-    function renderTables() {
-        const stockBody = document.getElementById('stockTableBody');
-        const logBody = document.getElementById('logTableBody');
-        stockBody.innerHTML = ''; logBody.innerHTML = '';
-
-        const categories = [...new Set(masterItems.map(i => i.category))];
-        categories.forEach(cat => {
-            stockBody.innerHTML += `<tr><td colspan="6" class="category-header">📁 ${cat}</td></tr>`;
-            masterItems.filter(i => i.category === cat).forEach(item => {
-                const itemTrans = transactions.filter(t => t.itemId === item.id);
-                const totalIn = itemTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
-                const totalOut = itemTrans.filter(t => t.type === 'OUT' || t.type === 'PELANGI').reduce((a, b) => a + b.qty, 0);
-                const closingBalance = item.opening + totalIn - totalOut;
-                let badge = closingBalance >= item.high ? `<span class="status-green">Sufficient</span>` : (closingBalance > 0 ? `<span class="status-yellow">Low</span>` : `<span class="status-red">Out</span>`);
-                stockBody.innerHTML += `<tr><td><b>${item.name}</b></td><td>${item.opening}</td><td class="tag-in">+${totalIn}</td><td class="tag-out">-${totalOut}</td><td><b>${closingBalance}</b></td><td>${badge}</td></tr>`;
-            });
-        });
-    }
-
-    function exportToExcel() {
-        const worksheet = XLSX.utils.json_to_sheet(masterItems);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory");
-        XLSX.writeFile(workbook, "Stock_Report.xlsx");
-    }
-</script>
-
-</body>
-</html>
+            masterItems.push({ id: idCounter++, category: cat.category,
