@@ -3,113 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concession Daily Sales Report</title>
+    <title>Concession Daily Sales Sheet</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
         body { background-color: #f0f2f5; padding: 10px; color: #333; }
         .container { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .top-nav h2 { font-size: 18px; margin: 0; }
-        .nav-btn { background: #16a34a; color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 13px; transition: 0.2s; }
         
-        .grid-layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
-        @media (max-width: 900px) { body { padding: 5px; } .container { padding: 12px; } .grid-layout { grid-template-columns: 1fr; } }
+        .page-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-bottom: 12px; 
+            margin-bottom: 15px; 
+            border-bottom: 2px solid #e2e8f0; 
+            gap: 10px;
+        }
+        .page-header h2 { font-size: 16px; color: #0f172a; font-weight: 700; margin: 0; }
+        .nav-btn { background: #16a34a; color: white; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; white-space: nowrap; }
+        .btn-pdf { background-color: #dc2626; color: white; padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; }
+        
         .card { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
-        .card h3 { margin-bottom: 12px; color: #0f172a; font-size: 14px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
-        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .btn-orange { background-color: #ea580c; color: white; }
-        .btn-purple { background-color: #9333ea; color: white; }
-        .btn-pdf { background-color: #dc2626; color: white; padding: 8px 12px; font-size: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; }
-        
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 5px; border-radius: 6px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
-        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        th { background-color: #1e293b; color: white; }
-        .tag-in { color: #16a34a; font-weight: bold; }
-        .tag-out { color: #dc2626; font-weight: bold; }
         .shift-badge { background-color: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
         
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 6px; border: 1px solid #cbd5e1; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        th { background-color: #0f172a; color: white; position: sticky; top: 0; }
+        
+        .inp-qty { width: 75px; padding: 5px; border: 1px solid #94a3b8; border-radius: 4px; font-weight: bold; text-align: center; }
+        .inp-qty:focus { border-color: #2563eb; outline: none; background: #eff6ff; }
+        
+        .closing-cell { font-weight: bold; color: #1e293b; font-size: 13px; }
+        .btn-save { background: #ea580c; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; }
+        .btn-save:hover { background: #c2410c; }
+        
         @media print {
-            .top-nav, .card, .btn-pdf, .shift-badge { display: none !important; }
-            .grid-layout { display: block !important; }
+            .page-header, .shift-badge, .btn-save, .btn-pdf { display: none !important; }
             body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; max-width: 100%; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; }
+            .inp-qty { border: none; background: transparent; text-align: left; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-nav">
-        <h2>🍿 Concession Daily Sales Report</h2>
-        <a href="index.html" class="nav-btn">⬅ Back to Store Stock Inventory</a>
+    <div class="page-header">
+        <h2>🍿 Concession Daily Sales Sheet</h2>
+        <div>
+            <button class="btn-pdf" onclick="window.print()">📄 Print / PDF</button>
+            <a href="index.html" class="nav-btn">⬅ Store Inventory</a>
+        </div>
     </div>
 
-    <div class="grid-layout">
-        <div>
-            <!-- 1. RECORD SALES FORM -->
-            <div class="card">
-                <h3>📝 Record Daily Sales</h3>
-                <div class="shift-badge">⏰ Cinema Shift: 6:00 AM - 5:59 AM Next Day</div>
-                <form id="salesForm">
-                    <div class="form-group"><label>Operational Date</label><input type="date" id="salesDate" required></div>
-                    <div class="form-group"><label>Select Item / Combo</label>
-                        <select id="salesItemSelect" required>
-                            <option value="">-- Select Concession Item --</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Stock Received (IN Today)</label><input type="number" id="salesIn" min="0" value="0" required></div>
-                    <div class="form-group"><label>Today Sales Quantity</label><input type="number" id="salesQty" min="1" value="1" required></div>
-                    <button type="submit" class="btn btn-orange">Save Sales Entry</button>
-                </form>
-            </div>
-
-            <!-- 2. ADD NEW CONCESSION ITEM -->
-            <div class="card">
-                <h3>➕ Add New Concession Item / Combo</h3>
-                <form id="addItemForm">
-                    <div class="form-group"><label>New Item / Combo Name</label><input type="text" id="newItemName" placeholder="e.g. Jumbo Combo" required></div>
-                    <div class="form-group"><label>Category</label>
-                        <select id="newItemCat" required>
-                            <option value="Combos">Combos</option>
-                            <option value="Hot/Cold Drinks">Hot/Cold Drinks</option>
-                            <option value="Fried Meals">Fried Meals</option>
-                            <option value="Snacks">Snacks</option>
-                            <option value="Bottled Drinks">Bottled Drinks</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-purple">Add to Menu</button>
-                </form>
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div class="shift-badge">⏰ Operational Shift: 6:00 AM - 5:59 AM Next Day</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 12px; font-weight: bold;">Date:</label>
+                <input type="date" id="salesDate" style="padding: 5px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: bold;">
             </div>
         </div>
 
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
-                    <h3>📊 Concession Daily Sales Summary</h3>
-                    <p style="font-size: 11px; color: #64748b;">Includes 6:00 AM cutoff operational day records</p>
-                </div>
-                <button class="btn-pdf" onclick="window.print()">📄 Download / Print PDF Report</button>
-            </div>
-
-            <div class="table-responsive">
+        <form id="bulkSalesForm">
+            <div class="table-responsive" style="margin-top: 10px; max-height: 70vh;">
                 <table>
                     <thead>
                         <tr>
-                            <th>Operational Date</th>
+                            <th>#</th>
                             <th>Item / Combo Name</th>
-                            <th>Category</th>
+                            <th>Opening</th>
                             <th>Stock IN</th>
-                            <th>Today Sales</th>
+                            <th>Today Sale (Input)</th>
+                            <th>Closing Balance</th>
                         </tr>
                     </thead>
-                    <tbody id="salesReportBody"></tbody>
+                    <tbody id="salesTableBody"></tbody>
                 </table>
             </div>
-        </div>
+            <button type="submit" class="btn-save">💾 Save All Daily Sales Entries to Google Sheet</button>
+        </form>
     </div>
 </div>
 
@@ -120,16 +93,15 @@
     function getOperationalDate() {
         const now = new Date();
         const hours = now.getHours();
-        if (hours < 6) {
-            now.setDate(now.getDate() - 1);
-        }
+        if (hours < 6) now.setDate(now.getDate() - 1);
         return now.toISOString().split('T')[0];
     }
 
     document.getElementById('salesDate').value = getOperationalDate();
 
-    let salesMenuList = [
-        "POPCORN (1 Popcorn cup)",
+    // 31 Concession Items List
+    const concessionItemsList = [
+        "POPCORN (Popcorn Cup)",
         "COMBO A (1 Popcorn, 2 Soft drinks, 1 Snack)",
         "COMBO B (1 Popcorn, 1 Soft drink)",
         "COMBO C (1 Popcorn, 2 Soft drinks)",
@@ -143,7 +115,11 @@
         "MASALA TEA (8oz Hot Cup & Lid)",
         "MILO ICE (Milo Cold Cup & Lid)",
         "ASAM BOI",
-        "CHIPSTER", "SUPER RINGS", "TWISTIES", "THUMBS", "MAMEE MONSTER",
+        "CHIPSTER",
+        "SUPER RINGS",
+        "TWISTIES",
+        "THUMBS",
+        "MAMEE MONSTER",
         "FRENCH FRIES (Fries + Meals box)",
         "CHICKEN POPCORN (Chicken Popcorn + Meals box)",
         "CHICKEN NUGGETS (Nuggets + Meals box)",
@@ -154,92 +130,93 @@
         "NACHOS CHEESE (Nachos Cheese + Meals box)",
         "KARIPAP (Karipap + Meals box)",
         "MEDU VADAI (Vadai + Meals box)",
-        "SWEET CORN (Sweet corn + Sweetcorn Cup & Lid)",
+        "SWEET CORN (Sweet corn + Cup & Lid)",
         "AYAM GUNTING (Ayam Gunting + Meals box)"
     ];
 
-    let salesLogs = [];
+    function renderSalesGrid() {
+        const tbody = document.getElementById('salesTableBody');
+        tbody.innerHTML = '';
 
-    function populateDropdown() {
-        const select = document.getElementById('salesItemSelect');
-        select.innerHTML = '<option value="">-- Select Concession Item --</option>';
-        salesMenuList.forEach(item => {
-            let opt = document.createElement('option');
-            opt.value = item;
-            opt.textContent = item;
-            select.appendChild(opt);
+        concessionItemsList.forEach((itemName, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><b>${itemName}</b></td>
+                    <td id="op_${index}">0</td>
+                    <td><input type="number" id="in_${index}" class="inp-qty" value="0" min="0" oninput="calcClosing(${index})"></td>
+                    <td><input type="number" id="sale_${index}" class="inp-qty" value="0" min="0" style="border-color: #ea580c; background: #fff7ed;" oninput="calcClosing(${index})"></td>
+                    <td id="close_${index}" class="closing-cell">0</td>
+                </tr>
+            `;
         });
+    }
+
+    function calcClosing(index) {
+        const opening = parseInt(document.getElementById(`op_${index}`).textContent) || 0;
+        const stockIn = parseInt(document.getElementById(`in_${index}`).value) || 0;
+        const todaySale = parseInt(document.getElementById(`sale_${index}`).value) || 0;
+        const closing = opening + stockIn - todaySale;
+        
+        const closeElem = document.getElementById(`close_${index}`);
+        closeElem.textContent = closing;
+        closeElem.style.color = closing < 0 ? '#dc2626' : '#1e293b';
     }
 
     function verifyPassword() {
         return prompt("Enter Manager Password:") === MANAGER_PASS ? true : (alert("Incorrect Password!"), false);
     }
 
-    document.getElementById('addItemForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!verifyPassword()) return;
-        const name = document.getElementById('newItemName').value.trim();
-        if (name && !salesMenuList.includes(name)) {
-            salesMenuList.push(name);
-            populateDropdown();
-            alert(`New item "${name}" added to sales menu!`);
-            document.getElementById('newItemName').value = '';
-        }
-    });
-
-    document.getElementById('salesForm').addEventListener('submit', (e) => {
+    document.getElementById('bulkSalesForm').addEventListener('submit', (e) => {
         e.preventDefault();
         if (!verifyPassword()) return;
 
         const date = document.getElementById('salesDate').value;
-        const itemKey = document.getElementById('salesItemSelect').value;
-        const stockIn = parseInt(document.getElementById('salesIn').value) || 0;
-        const todaySale = parseInt(document.getElementById('salesQty').value) || 0;
+        let entriesToSave = [];
 
-        const payload = {
-            action: "add_sales",
-            date: date,
-            itemName: itemKey,
-            category: "Concession Sales",
-            opening: 0,
-            stockIn: stockIn,
-            todaySale: todaySale,
-            closing: 0
-        };
+        concessionItemsList.forEach((itemName, index) => {
+            const opening = parseInt(document.getElementById(`op_${index}`).textContent) || 0;
+            const stockIn = parseInt(document.getElementById(`in_${index}`).value) || 0;
+            const todaySale = parseInt(document.getElementById(`sale_${index}`).value) || 0;
+            const closing = opening + stockIn - todaySale;
 
-        salesLogs.push(payload);
+            // Save entries that have sales or stock in
+            if (todaySale > 0 || stockIn > 0) {
+                entriesToSave.push({
+                    action: "add_sales",
+                    date: date,
+                    itemName: itemName,
+                    category: "Concession",
+                    opening: opening,
+                    stockIn: stockIn,
+                    todaySale: todaySale,
+                    closing: closing
+                });
+            }
+        });
 
+        if (entriesToSave.length === 0) {
+            alert("No Sales or Stock IN entries recorded!");
+            return;
+        }
+
+        // Send data to Google Apps Script
         if (SCRIPT_URL) {
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+            entriesToSave.forEach(payload => {
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
             });
         }
 
-        alert(`Sales recorded for ${itemKey}!`);
-        document.getElementById('salesIn').value = '0';
-        document.getElementById('salesQty').value = '1';
-        renderSalesTable();
+        alert(`Successfully saved ${entriesToSave.length} Sales entries to Google Sheet!`);
     });
 
-    function renderSalesTable() {
-        const body = document.getElementById('salesReportBody');
-        body.innerHTML = '';
-        salesLogs.forEach(s => {
-            body.innerHTML += `<tr>
-                <td><b>${s.date}</b></td>
-                <td><b>${s.itemName}</b></td>
-                <td>Concession</td>
-                <td class="tag-in">+${s.stockIn}</td>
-                <td class="tag-out">-${s.todaySale}</td>
-            </tr>`;
-        });
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-        populateDropdown();
+        renderSalesGrid();
     });
 </script>
 
