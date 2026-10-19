@@ -3,86 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concession Daily Sales Sheet</title>
+    <title>Concession Sales Tracker</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
         body { background-color: #f0f2f5; padding: 10px; color: #333; }
         .container { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
+        /* Header Section */
         .page-header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             padding-bottom: 12px; 
-            margin-bottom: 15px; 
+            margin-bottom: 18px; 
             border-bottom: 2px solid #e2e8f0; 
             gap: 10px;
         }
-        .page-header h2 { font-size: 16px; color: #0f172a; font-weight: 700; margin: 0; }
-        .nav-btn { background: #16a34a; color: white; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; white-space: nowrap; }
-        .btn-pdf { background-color: #dc2626; color: white; padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; }
-        
-        .card { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
-        .shift-badge { background-color: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-        
-        .table-responsive { width: 100%; overflow-x: auto; border-radius: 6px; border: 1px solid #cbd5e1; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
-        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        th { background-color: #0f172a; color: white; position: sticky; top: 0; }
-        
-        .inp-qty { width: 75px; padding: 5px; border: 1px solid #94a3b8; border-radius: 4px; font-weight: bold; text-align: center; }
-        .inp-qty:focus { border-color: #2563eb; outline: none; background: #eff6ff; }
-        
-        .closing-cell { font-weight: bold; color: #1e293b; font-size: 13px; }
-        .btn-save { background: #ea580c; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; }
-        .btn-save:hover { background: #c2410c; }
-        
-        @media print {
-            .page-header, .shift-badge, .btn-save, .btn-pdf { display: none !important; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; padding: 0; }
-            .inp-qty { border: none; background: transparent; text-align: left; }
+        .page-header h2 { font-size: 15px; color: #0f172a; font-weight: 700; margin: 0; }
+        .nav-btn { 
+            background: #2563eb; 
+            color: white; 
+            text-decoration: none; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 12px; 
+            white-space: nowrap; 
+            flex-shrink: 0;
+            transition: 0.2s;
         }
+        .nav-btn:hover { background: #1d4ed8; }
+        
+        .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+        @media (max-width: 900px) {
+            body { padding: 5px; } 
+            .container { padding: 10px; } 
+            .grid-layout { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: flex-start !important; }
+            .toolbar-btns { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
+        }
+        .card { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .card h3 { margin-bottom: 12px; color: #0f172a; font-size: 14px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 13px; }
+        .btn-primary { background-color: #2563eb; color: white; }
+        .btn-success { background-color: #ea580c; color: white; }
+        .btn-purple { background-color: #9333ea; color: white; }
+        .btn-pdf { background-color: #dc2626; color: white; padding: 8px 10px; font-size: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+        
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 5px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .category-header { background-color: #334155; color: #fff; font-weight: bold; padding: 8px 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
+        th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        th { background-color: #1e293b; color: white; }
+        .tag-in { color: #16a34a; font-weight: bold; }
+        .tag-out { color: #dc2626; font-weight: bold; }
+        .status-green { background-color: #dcfce7; color: #15803d; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .status-yellow { background-color: #fef9c3; color: #a16207; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .status-red { background-color: #fee2e2; color: #b91c1c; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .shift-badge { background-color: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="page-header">
-        <h2>🍿 Concession Daily Sales Sheet</h2>
-        <div>
-            <button class="btn-pdf" onclick="window.print()">📄 Print / PDF</button>
-            <a href="index.html" class="nav-btn">⬅ Store Inventory</a>
-        </div>
+        <h2>🍿 Concession Daily Sales Tracker</h2>
+        <a href="index.html" class="nav-btn">⬅ Store Inventory</a>
     </div>
 
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <div class="shift-badge">⏰ Operational Shift: 6:00 AM - 5:59 AM Next Day</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <label style="font-size: 12px; font-weight: bold;">Date:</label>
-                <input type="date" id="salesDate" style="padding: 5px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: bold;">
+    <div class="grid-layout">
+        <div>
+            <!-- CARD 1: DAILY IN / OUT / SALES LOG -->
+            <div class="card">
+                <h3>🔄 1. Concession Daily In / Sale Log</h3>
+                <div class="shift-badge">⏰ Shift: 6:00 AM - 5:59 AM Next Day</div>
+                <form id="transForm">
+                    <div class="form-group"><label>Operational Date</label><input type="date" id="transDate" required></div>
+                    <div class="form-group"><label>Select Item / Combo</label><select id="transItemSelect" required><option value="">-- Select Item --</option></select></div>
+                    <div class="form-group"><label>Type</label>
+                        <select id="transType" required>
+                            <option value="TODAY_SALE">TODAY SALE (Sold / Out)</option>
+                            <option value="IN">IN (Stock Received)</option>
+                            <option value="WASTAGE">WASTAGE / DAMAGE</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="transQty" min="1" placeholder="0" required></div>
+                    <button type="submit" class="btn btn-success">Save Entry (Requires Password)</button>
+                </form>
+            </div>
+
+            <!-- CARD 2: SET OPENING STOCK -->
+            <div class="card">
+                <h3>⚙️ 2. Set Concession Opening Stock</h3>
+                <form id="addItemForm">
+                    <div class="form-group"><label>Category</label>
+                        <select id="newCat" onchange="populateItemDropdown()" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Combos">Combos</option>
+                            <option value="Hot/Cold Drinks">Hot/Cold Drinks</option>
+                            <option value="Fried Meals">Fried Meals</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Bottled Drinks">Bottled Drinks</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Item Name</label><select id="newItemSelect" required><option value="">-- Select Category First --</option></select></div>
+                    <div class="form-group"><label>Opening Stock</label><input type="number" id="newOpeningStock" min="0" value="0" required></div>
+                    <button type="submit" class="btn btn-primary">Update Opening Stock (Password)</button>
+                </form>
+            </div>
+
+            <!-- CARD 3: ADD NEW ITEM -->
+            <div class="card">
+                <h3>➕ 3. Add New Item to Menu</h3>
+                <form id="addNewItemForm">
+                    <div class="form-group"><label>Select Category</label>
+                        <select id="addCustomCat" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Combos">Combos</option>
+                            <option value="Hot/Cold Drinks">Hot/Cold Drinks</option>
+                            <option value="Fried Meals">Fried Meals</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Bottled Drinks">Bottled Drinks</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>New Item Name</label><input type="text" id="addCustomName" placeholder="e.g. Jumbo Combo" required></div>
+                    <div class="form-group"><label>Initial Opening Stock</label><input type="number" id="addCustomOpening" min="0" value="0" required></div>
+                    <button type="submit" class="btn btn-purple">Add New Item (Password)</button>
+                </form>
             </div>
         </div>
 
-        <form id="bulkSalesForm">
-            <div class="table-responsive" style="margin-top: 10px; max-height: 70vh;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Item / Combo Name</th>
-                            <th>Opening</th>
-                            <th>Stock IN</th>
-                            <th>Today Sale (Input)</th>
-                            <th>Closing Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salesTableBody"></tbody>
+        <div>
+            <div class="toolbar">
+                <h3>📊 Concession Summary Board</h3>
+                <div class="toolbar-btns">
+                    <button class="btn-pdf" onclick="window.print()">📄 Print PDF Report</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="stockTable">
+                    <thead><tr><th>Item Name</th><th>Opening</th><th>Total IN</th><th>Total Sale</th><th>Closing Balance</th><th>Status</th></tr></thead>
+                    <tbody id="stockTableBody"></tbody>
                 </table>
             </div>
-            <button type="submit" class="btn-save">💾 Save All Daily Sales Entries to Google Sheet</button>
-        </form>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px;">📋 Concession Daily Transaction Log</h3>
+            <div class="table-responsive">
+                <table id="logTable">
+                    <thead><tr><th>Date</th><th>Item / Combo</th><th>Type</th><th>Quantity</th></tr></thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -97,127 +174,234 @@
         return now.toISOString().split('T')[0];
     }
 
-    document.getElementById('salesDate').value = getOperationalDate();
+    document.getElementById('transDate').value = getOperationalDate();
 
-    // 31 Concession Items List
-    const concessionItemsList = [
-        "POPCORN (Popcorn Cup)",
-        "COMBO A (1 Popcorn, 2 Soft drinks, 1 Snack)",
-        "COMBO B (1 Popcorn, 1 Soft drink)",
-        "COMBO C (1 Popcorn, 2 Soft drinks)",
-        "COMBO D (1 Popcorn, 1 Soft drink, 1 Mineral Water)",
-        "FAMILY COMBO (2 Popcorn, 4 Soft drinks)",
-        "MINERAL WATER",
-        "BOTTLE DRINKS (F&N / 100 Plus)",
-        "SOFT DRINKS (22oz Cup & Lid)",
-        "NESCAFE (8oz Hot Cup & Lid)",
-        "HOT MILO (8oz Hot Cup & Lid)",
-        "MASALA TEA (8oz Hot Cup & Lid)",
-        "MILO ICE (Milo Cold Cup & Lid)",
-        "ASAM BOI",
-        "CHIPSTER",
-        "SUPER RINGS",
-        "TWISTIES",
-        "THUMBS",
-        "MAMEE MONSTER",
-        "FRENCH FRIES (Fries + Meals box)",
-        "CHICKEN POPCORN (Chicken Popcorn + Meals box)",
-        "CHICKEN NUGGETS (Nuggets + Meals box)",
-        "MINI SAUSAGE (Mini Sausage + Meals box)",
-        "ONION RINGS (Onion Rings + Meals box)",
-        "CHEESE WEDGES (Cheese Wedges + Meals box)",
-        "CORNDOUGH CHEESE (Corndough + Meals box)",
-        "NACHOS CHEESE (Nachos Cheese + Meals box)",
-        "KARIPAP (Karipap + Meals box)",
-        "MEDU VADAI (Vadai + Meals box)",
-        "SWEET CORN (Sweet corn + Cup & Lid)",
-        "AYAM GUNTING (Ayam Gunting + Meals box)"
+    const defaultConcessionCategories = [
+        { category: "Combos", items: [{ name: "COMBO A (1 Popcorn, 2 Soft drinks, 1 Snack)" }, { name: "COMBO B (1 Popcorn, 1 Soft drink)" }, { name: "COMBO C (1 Popcorn, 2 Soft drinks)" }, { name: "COMBO D (1 Popcorn, 1 Soft drink, 1 Mineral Water)" }, { name: "FAMILY COMBO (2 Popcorn, 4 Soft drinks)" }] },
+        { category: "Hot/Cold Drinks", items: [{ name: "SOFT DRINKS (22oz Cup & Lid)" }, { name: "NESCAFE (8oz Hot Cup & Lid)" }, { name: "HOT MILO (8oz Hot Cup & Lid)" }, { name: "MASALA TEA (8oz Hot Cup & Lid)" }, { name: "MILO ICE (Milo Cold Cup & Lid)" }, { name: "ASAM BOI" }] },
+        { category: "Fried Meals", items: [{ name: "FRENCH FRIES (Fries + Meals box)" }, { name: "CHICKEN POPCORN (Chicken Popcorn + Meals box)" }, { name: "CHICKEN NUGGETS (Nuggets + Meals box)" }, { name: "MINI SAUSAGE (Mini Sausage + Meals box)" }, { name: "ONION RINGS (Onion Rings + Meals box)" }, { name: "CHEESE WEDGES (Cheese Wedges + Meals box)" }, { name: "CORNDOUGH CHEESE (Corndough + Meals box)" }, { name: "NACHOS CHEESE (Nachos Cheese + Meals box)" }, { name: "KARIPAP (Karipap + Meals box)" }, { name: "MEDU VADAI (Vadai + Meals box)" }, { name: "SWEET CORN (Sweet corn + Cup & Lid)" }, { name: "AYAM GUNTING (Ayam Gunting + Meals box)" }] },
+        { category: "Snacks", items: [{ name: "POPCORN (Popcorn Cup)" }, { name: "CHIPSTER" }, { name: "SUPER RINGS" }, { name: "TWISTIES" }, { name: "THUMBS" }, { name: "MAMEE MONSTER" }] },
+        { category: "Bottled Drinks", items: [{ name: "MINERAL WATER" }, { name: "BOTTLE DRINKS (F&N / 100 Plus)" }] }
     ];
 
-    function renderSalesGrid() {
-        const tbody = document.getElementById('salesTableBody');
-        tbody.innerHTML = '';
-
-        concessionItemsList.forEach((itemName, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td><b>${itemName}</b></td>
-                    <td id="op_${index}">0</td>
-                    <td><input type="number" id="in_${index}" class="inp-qty" value="0" min="0" oninput="calcClosing(${index})"></td>
-                    <td><input type="number" id="sale_${index}" class="inp-qty" value="0" min="0" style="border-color: #ea580c; background: #fff7ed;" oninput="calcClosing(${index})"></td>
-                    <td id="close_${index}" class="closing-cell">0</td>
-                </tr>
-            `;
+    let masterItems = [];
+    let idCounter = 1;
+    defaultConcessionCategories.forEach(cat => {
+        cat.items.forEach(itemObj => {
+            masterItems.push({ id: idCounter++, category: cat.category, name: itemObj.name, high: 10, low: 5, opening: 0 });
         });
-    }
+    });
 
-    function calcClosing(index) {
-        const opening = parseInt(document.getElementById(`op_${index}`).textContent) || 0;
-        const stockIn = parseInt(document.getElementById(`in_${index}`).value) || 0;
-        const todaySale = parseInt(document.getElementById(`sale_${index}`).value) || 0;
-        const closing = opening + stockIn - todaySale;
-        
-        const closeElem = document.getElementById(`close_${index}`);
-        closeElem.textContent = closing;
-        closeElem.style.color = closing < 0 ? '#dc2626' : '#1e293b';
+    let transactions = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateItemDropdown();
+        renderTables(); 
+        fetchFromGoogleSheets();
+    });
+
+    function fetchFromGoogleSheets() {
+        if (!SCRIPT_URL) return;
+        fetch(SCRIPT_URL + "?cache=" + new Date().getTime())
+            .then(res => res.json())
+            .then(data => {
+                if (data.sales && Array.isArray(data.sales)) {
+                    masterItems.forEach(i => i.opening = 0);
+                    transactions = [];
+                    data.sales.forEach((t, idx) => {
+                        let item = masterItems.find(i => i.name.trim().toLowerCase() === String(t.itemName).trim().toLowerCase());
+                        if (!item && t.itemName) {
+                            item = { id: idCounter++, category: t.category || "General", name: t.itemName, high: 10, low: 5, opening: 0 };
+                            masterItems.push(item);
+                        }
+                        if (item && String(t.type).trim().toUpperCase() === 'OPENING') {
+                            item.opening = Number(t.opening || t.qty || 0);
+                        } else {
+                            transactions.push({
+                                id: Date.now() + idx,
+                                date: t.date,
+                                itemName: t.itemName,
+                                itemId: item ? item.id : 0,
+                                type: t.type || (t.todaySale > 0 ? "TODAY_SALE" : "IN"),
+                                qty: Number(t.todaySale || t.stockIn || t.qty || 0)
+                            });
+                        }
+                    });
+                    updateItemDropdown();
+                    renderTables();
+                }
+            }).catch(e => console.log("Fetch error", e));
     }
 
     function verifyPassword() {
         return prompt("Enter Manager Password:") === MANAGER_PASS ? true : (alert("Incorrect Password!"), false);
     }
 
-    document.getElementById('bulkSalesForm').addEventListener('submit', (e) => {
+    function updateItemDropdown() {
+        const select = document.getElementById('transItemSelect');
+        select.innerHTML = '<option value="">-- Select Item --</option>';
+        const categories = [...new Set(masterItems.map(i => i.category))];
+        categories.forEach(cat => {
+            const og = document.createElement('optgroup'); og.label = cat;
+            masterItems.filter(i => i.category === cat).forEach(item => {
+                let opt = document.createElement('option'); opt.value = item.id; opt.textContent = item.name;
+                og.appendChild(opt);
+            });
+            select.appendChild(og);
+        });
+    }
+
+    function populateItemDropdown() {
+        const cat = document.getElementById('newCat').value;
+        const select = document.getElementById('newItemSelect');
+        select.innerHTML = '<option value="">-- Select Item --</option>';
+        masterItems.filter(i => i.category === cat).forEach(item => {
+            let opt = document.createElement('option');
+            opt.value = item.id;
+            opt.textContent = `${item.name} (Opening: ${item.opening})`;
+            select.appendChild(opt);
+        });
+    }
+
+    // 1. Transaction Entry
+    document.getElementById('transForm').addEventListener('submit', (e) => {
         e.preventDefault();
         if (!verifyPassword()) return;
+        const date = document.getElementById('transDate').value;
+        const itemId = parseInt(document.getElementById('transItemSelect').value);
+        const type = document.getElementById('transType').value;
+        const qty = parseInt(document.getElementById('transQty').value);
+        const item = masterItems.find(i => i.id === itemId);
 
-        const date = document.getElementById('salesDate').value;
-        let entriesToSave = [];
+        const payload = {
+            action: "add_sales",
+            date: date,
+            itemName: item.name,
+            category: item.category,
+            type: type,
+            opening: item.opening,
+            stockIn: type === "IN" ? qty : 0,
+            todaySale: (type === "TODAY_SALE" || type === "WASTAGE") ? qty : 0,
+            closing: 0
+        };
 
-        concessionItemsList.forEach((itemName, index) => {
-            const opening = parseInt(document.getElementById(`op_${index}`).textContent) || 0;
-            const stockIn = parseInt(document.getElementById(`in_${index}`).value) || 0;
-            const todaySale = parseInt(document.getElementById(`sale_${index}`).value) || 0;
-            const closing = opening + stockIn - todaySale;
+        transactions.push({ id: Date.now(), date, itemName: item.name, itemId, type, qty });
 
-            // Save entries that have sales or stock in
-            if (todaySale > 0 || stockIn > 0) {
-                entriesToSave.push({
-                    action: "add_sales",
-                    date: date,
-                    itemName: itemName,
-                    category: "Concession",
-                    opening: opening,
-                    stockIn: stockIn,
-                    todaySale: todaySale,
-                    closing: closing
-                });
-            }
-        });
-
-        if (entriesToSave.length === 0) {
-            alert("No Sales or Stock IN entries recorded!");
-            return;
+        if (SCRIPT_URL) {
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => setTimeout(fetchFromGoogleSheets, 1200));
         }
 
-        // Send data to Google Apps Script
-        if (SCRIPT_URL) {
-            entriesToSave.forEach(payload => {
+        document.getElementById('transQty').value = '';
+        renderTables();
+    });
+
+    // 2. Set Opening Stock Entry
+    document.getElementById('addItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!verifyPassword()) return;
+        const itemId = parseInt(document.getElementById('newItemSelect').value);
+        const openingQty = parseInt(document.getElementById('newOpeningStock').value);
+        const item = masterItems.find(i => i.id === itemId);
+        if (item) {
+            item.opening = openingQty;
+            const payload = {
+                action: "add_sales",
+                date: getOperationalDate(),
+                itemName: item.name,
+                category: item.category,
+                type: "OPENING",
+                opening: openingQty,
+                stockIn: 0,
+                todaySale: 0,
+                closing: openingQty
+            };
+
+            if (SCRIPT_URL) {
                 fetch(SCRIPT_URL, {
                     method: "POST",
                     mode: "no-cors",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
-                });
-            });
+                }).then(() => setTimeout(fetchFromGoogleSheets, 1200));
+            }
+            alert(`Opening Stock updated for ${item.name}!`);
+            renderTables();
         }
-
-        alert(`Successfully saved ${entriesToSave.length} Sales entries to Google Sheet!`);
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderSalesGrid();
+    // 3. Add Custom Item Entry
+    document.getElementById('addNewItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!verifyPassword()) return;
+        const cat = document.getElementById('addCustomCat').value;
+        const name = document.getElementById('addCustomName').value.trim();
+        const openingQty = parseInt(document.getElementById('addCustomOpening').value);
+
+        if (name) {
+            const newItem = { id: idCounter++, category: cat, name: name, high: 10, low: 5, opening: openingQty };
+            masterItems.push(newItem);
+
+            const payload = {
+                action: "add_sales",
+                date: getOperationalDate(),
+                itemName: name,
+                category: cat,
+                type: "OPENING",
+                opening: openingQty,
+                stockIn: 0,
+                todaySale: 0,
+                closing: openingQty
+            };
+
+            if (SCRIPT_URL) {
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }).then(() => setTimeout(fetchFromGoogleSheets, 1200));
+            }
+
+            alert(`New Item "${name}" added!`);
+            document.getElementById('addCustomName').value = '';
+            updateItemDropdown();
+            renderTables();
+        }
     });
+
+    function renderTables() {
+        const stockBody = document.getElementById('stockTableBody');
+        const logBody = document.getElementById('logTableBody');
+        stockBody.innerHTML = ''; logBody.innerHTML = '';
+
+        const categories = [...new Set(masterItems.map(i => i.category))];
+        categories.forEach(cat => {
+            stockBody.innerHTML += `<tr><td colspan="6" class="category-header">📁 ${cat}</td></tr>`;
+            masterItems.filter(i => i.category === cat).forEach(item => {
+                const itemTrans = transactions.filter(t => t.itemId === item.id || t.itemName === item.name);
+                const totalIn = itemTrans.filter(t => t.type === 'IN').reduce((a, b) => a + b.qty, 0);
+                const totalSale = itemTrans.filter(t => t.type === 'TODAY_SALE' || t.type === 'WASTAGE').reduce((a, b) => a + b.qty, 0);
+                const closingBalance = item.opening + totalIn - totalSale;
+                let badge = closingBalance > 5 ? `<span class="status-green">In Stock</span>` : (closingBalance > 0 ? `<span class="status-yellow">Low</span>` : `<span class="status-red">Out</span>`);
+                stockBody.innerHTML += `<tr><td><b>${item.name}</b></td><td>${item.opening}</td><td class="tag-in">+${totalIn}</td><td class="tag-out">-${totalSale}</td><td><b>${closingBalance}</b></td><td>${badge}</td></tr>`;
+            });
+        });
+
+        // Daily Transaction Log Display
+        transactions.slice().reverse().forEach(t => {
+            logBody.innerHTML += `<tr>
+                <td>${t.date}</td>
+                <td><b>${t.itemName}</b></td>
+                <td><span class="${t.type === 'IN' ? 'tag-in' : 'tag-out'}">${t.type}</span></td>
+                <td>${t.qty}</td>
+            </tr>`;
+        });
+    }
 </script>
 
 </body>
